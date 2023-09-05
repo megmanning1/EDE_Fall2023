@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1: Introduction"
-author: "Student Name"
+author: "Meg Manning"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -10,12 +10,12 @@ geometry: margin=2.54cm
 This exercise accompanies the introductory material in Environmental Data Analytics. 
 
 ## Directions
-1.  Rename this file `<FirstLast>_A01_Introduction.Rmd` (replacing `<FirstLast>` with your first and last name).
+1.  Rename this file `<MegManning>_A01_Introduction.Rmd` (replacing `<FirstLast>` with your first and last name).
 2.  Change "Student Name" on line 3 (above) with your name.
 3.  Work through the steps, **creating code and output** that fulfill each instruction.
 4.  Be sure to **answer the questions** in this assignment document.
 5.  When you have completed the assignment, **Knit** the text and code into a single PDF file.
-6.  After Knitting, submit the completed exercise (PDF file) to the appropriate assigment section on Sakai.
+6.  After Knitting, submit the completed exercise (PDF file) to the appropriate assignment section on Sakai.
 
 
 ## 1) Finish setting up R Studio
@@ -39,22 +39,22 @@ Enter answers to the questions just below the >Answer: prompt.
 
 1. What are your previous experiences with data analytics, R, and Git? Include both formal and informal training.
 
-> Answer: 
+> Answer: In college I took a data science course where we breifly used R and Git to create visuals for scientific data. That course happened a few years ago and it was completely remote due to COVID, so I feel like a brand new user to R and Git with no formal training.
 
 2. Are there any components of the course about which you feel confident?
 
-> Answer: 
+> Answer: Honestly, I am feely a bit overwhelmed, but excited to learn more. I am excited to think about data visualizations/applications of R, but not confident on how to use it yet.
 
 3. Are there any components of the course about which you feel apprehensive?
 
-> Answer: 
+> Answer: I've never had any formal training in coding, so I'm a little nervous about learning everything and keeping up with the class. 
 
 
 ## 3) GitHub
 
 Provide a link below to your forked course repository in GitHub. Make sure you have pulled all recent changes from the course repository and that you have updated your course README file, committed those changes, and pushed them to your GitHub account. 
 
-> Answer: 
+> Answer: https://github.com/megmanning1/EDE_Fall2023
 
 ## 4) Knitting
 When you have completed this document, click the `knit` button.This should produce a PDF copy of your markdown document. Submit this PDF to Sakai. 
