@@ -31,12 +31,17 @@ This exercise accompanies the lessons in Environmental Data Analytics on coding 
 4.  Insert comments in your code to describe what you are doing.
 
 ```{r basics 1}
-#1. 
+#1. #create a sequence from 1-30 increasing by 3 and assign name
+seq1 <- seq(1,30,3)
+View(seq1)
 
-#2. 
+#2. #Compute mean and median of seq1 using mean() and median() functions
+mean(seq1)
+median(seq1)
 
-#3. 
-
+#3.#ask if mean is greater than median
+mean(seq1) > median(seq1)
+#since they are the same, it gives the result FALSE, meaning the mean is not greater than the median
 ```
 
 ## Basics, Part 2
@@ -50,6 +55,15 @@ This exercise accompanies the lessons in Environmental Data Analytics on coding 
 8.  Label the columns of your data frame with informative titles.
 
 ```{r basics 2}
+#create a vector for names using c()
+names <- c("Meg", "Josh", "Nick", "Melissa") #character or string vector
+#Create a vector for test scores out of 100
+test_results <- c(99, 75, 50, 92) #numeric
+#create a vector for if they passed
+passed_or_not <- c(TRUE, TRUE, FALSE, TRUE) #logical vector
+
+#combine vectors into a data frame and assign a name
+dataframe1 <- cbind(names,test_results,passed_or_not)
 
 ```
 
