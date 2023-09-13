@@ -99,4 +99,4 @@ passing_grade(test_results)
 
 12. QUESTION: Which option of `if` and `else` vs. `ifelse` worked? Why?
 
-> Answer:
+> Answer: ifelse worked better because it was a simple function to use because regardless of what you set the function to do with your input, it will either result in a "TRUE" or "FALSE" statement which is what we are trying to figure out. 
