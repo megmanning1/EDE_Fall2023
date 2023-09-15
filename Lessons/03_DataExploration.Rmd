@@ -152,7 +152,7 @@ summary(USGS.flow.data$discharge.mean)
 ```
 
 What happened to blank cells in the spreadsheet when they were imported into R?
-> Answer: 
+> Answer: Blank cells are given "N/A" indication no value, and are represented as ,,, (multiple commas) in a row showing there is no data in that part of the data frame. 
 
 ## Adjusting Datasets
 
@@ -161,6 +161,11 @@ What happened to blank cells in the spreadsheet when they were imported into R?
 Notice in our dataset that our discharge and gage height observations have many NAs, meaning no measurement was recorded for a specific day. In some cases, it might be in our best interest to remove NAs from a dataset. Removing NAs or not will depend on your research question.
 
 ```{r Finding NAs}
+#If NAs are in the beginning of dataset this is easier to remove - but if they are in the middle of a dataset we have to be careful how we remove them
+
+#If we want to omit NAs
+#First let's see how many we have using summary statistics...
+
 summary(USGS.flow.data$discharge.mean)
 summary(USGS.flow.data$gage.height.mean)
 ```
@@ -169,12 +174,24 @@ Question: What types of research questions might make it favorable to remove NAs
 > Answer: 
 
 ```{r Removing NAs}
+#To remove NAs use the na.omit() function (remember to assign this to the dataset)
+#This takes one main argument (our data frame)
+#Create new object to store this data so we don't mess up original raw data
 USGS.flow.data.complete <- na.omit(USGS.flow.data)
-dim(USGS.flow.data)
+#see how many rows/columns of data 
+dim(USGS.flow.data) 
+#easy way to see how many rows have been removed by comparing original data to new data frame
 dim(USGS.flow.data.complete)
 
+#We removed the NA's so that we could compute the mean, so now that we have a new data frame without any NA's we can now compute summary statistics on new dataset
+
+#Compute mean using mean() can specify which columns using $
 mean(USGS.flow.data.complete$discharge.mean)
+
+#Standard deviation using sd() function 
 sd(USGS.flow.data.complete$discharge.mean)
+
+#summary statistics using summary()
 summary(USGS.flow.data.complete$discharge.mean)
 
 ```
@@ -191,12 +208,13 @@ Formatting of dates in R:
 %Y  4-digit year
 %a  abbreviated weekday
 %A  unabbreviated weekday
-%b  abbreviated month
-%B  unabbreviated month
+%b  abbreviated month (Jan)
+%B  unabbreviated month (January)
 
 In some cases when dates are provided as integers, you may need to provide an origin for your dates. Beware: the "origin" date for Excel (Windows), Excel (Mac), R, and MATLAB all have different origin dates. Google this if it comes up.
 
 ```{r Date formats}
+#We need to tell R that some of our data are dates -- use the help(as.Data) to see what as.Date() does
 help(as.Date)
 
 # Adjust date formatting [to be done in lab session]
@@ -209,25 +227,35 @@ format(today, format = "%B")
 #format(today, format = "")
 #format(today, format = "")
 
-USGS.flow.data$datetime <- as.Date(USGS.flow.data$datetime, format = "%m/%d/%y") 
+#How do we transform our datetime column into a date object and not a character object
+#replace column 
+USGS.flow.data$datetime <- as.Date(USGS.flow.data$datetime, format = "%m/%d/%y")
+
+#as.Date() function will receive two main inputs, 1) the column we are representing (make sure for all data not just data without NAs), 2) format we have on data (month (%m), day (%d), year (%y or %Y))
+#we have to know the format of our datetime column to pass that info into R 
 ```
 
 Note that for every date prior to 1969, R has assigned the date in the 2000s rather than the 1900s. This can be fixed with an `ifelse` statement inside a function. Run through the code below and write what is happening in the comment above each line.
 
 ```{r Fixing dates}
-# 
+# Say our dates are wrong - in this data it says the year is 2068 - let's fix that!
+#Steps
+#1 remove the two digits that are wrong (2027 - remove the 20)
+#format() function will convert the date object back into a character 
 USGS.flow.data$datetime <- format(USGS.flow.data$datetime, "%y%m%d")
 
-#
+#create a function & assign it to an object, paste0 function will "glue" strings and characters together - we need to glue the 19 or 20 depending on the ifelse statment, we need to glue this to d (the input, whatever is assigned in datetime column)
 create.early.dates <- (function(d) {
        paste0(ifelse(d > 191226,"19","20"),d)
        })
-#
+#Run this line using our function and putting in the dataset we're working with 
 USGS.flow.data$datetime <- create.early.dates(USGS.flow.data$datetime)
 
-#
+#Now we have to convert this back to a date (we converted to a character format and now we have to put it back as a date) 
+#Note that we are using %Y instead of %y because year is defined with 4 digits
 USGS.flow.data$datetime <- as.Date(USGS.flow.data$datetime, format = "%Y%m%d") 
 
+#now the year is fixed!
 ```
 
 ## Saving datasets
@@ -236,6 +264,9 @@ We just edited our raw dataset into a processed form. We may want to return to t
 
 
 ```{r Saving data}
+#Use the write.csv() function to tell R to write the data into a csv file 
+#file = gives the relative path and name of file
+#row.names = 
 write.csv(USGS.flow.data, file = "./Data/Processed/USGS_Site02085000_Flow_Processed.csv", row.names=FALSE)
 
 ```
