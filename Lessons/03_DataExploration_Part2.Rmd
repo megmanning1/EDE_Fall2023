@@ -216,4 +216,6 @@ Do you see any patterns in the USGS data for the Eno River? What might be respon
 
 > Answer: 
 
+##Tips and Notes from Lecture
 
+Naming coding chunks (put it next to {```r name`}) 
