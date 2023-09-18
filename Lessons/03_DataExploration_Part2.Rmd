@@ -127,7 +127,7 @@ An alternate to a histogram is a frequency polygon graph (distributions of value
 
 WHY USE: 
 
-```{r, fig.height = 3, fig.width = 4}
+```{r name, fig.height = 3, fig.width = 4}
 #use different geometry --> find cheat sheet (help - cheat sheet - ggplot2) - quick look at geometries, how to modify
 #you can plot mutliple things at once if you want (add graphs alphabetically to ggplot (like a histogram with a line (geom_freq)))
 ggplot(USGS.flow.data) +
@@ -142,6 +142,8 @@ ggplot(USGS.flow.data) +
   scale_x_continuous(limits = c(0, 10))
 
 #modify the aesthetics -- takeway = you can set other data to colors and show two categories of data on same plot
+#important to know when you are setting the color as part of the aesthetics or outside of it 
+#important to notice the difference between this plot and the one about - main difference is that you are either changing just the color of the line versus coloring it by type of data (ex. vector)
 ggplot(USGS.flow.data) +
   geom_freqpoly(aes(x = gage.height.mean, color = gage.height.mean.approval), bins = 50) +
   scale_x_continuous(limits = c(0, 10)) +
@@ -201,7 +203,8 @@ Question: under what circumstances would it be beneficial to use each of these g
 ## Ending discussion
 
 What did you learn about the USGS discharge dataset today? What separate insights did the different graph types offer?
-> Answer: 
+
+> Answer: Different visualizations of the data showed distributions of the mean gage height and other variables, as well as outliers, median values in the dataset. 
 
 
 How can multiple options for data exploration inform our understanding of our data?
