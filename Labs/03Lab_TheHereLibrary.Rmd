@@ -62,7 +62,7 @@ filenames <- dir(here('Data','Raw'),pattern = ("*.csv"))
  2. Refer to the example code shown here (http://jenrichmond.rbind.io/post/where-is-here/) to read in all CSV files starting with "EPAair_03" into a single dataframe. 
 ```{r here in action}
 
-# 1. 
+# 1. filename <- here()
 
 
 # 2.

@@ -134,7 +134,7 @@ sd(df_temp$High.Temp.in.F)
 
 ### Date objects
 
-Remember formatting of dates in R:
+Remember formatting of dates in R: (can use as.date(), but maybe more useful is *ymd()* or *ydm()* or *mdy*() - doesn't matter if there are abr. years or months - to change from factor as an object)
 
 %d day as number (0-31) %m month (00-12, can be e.g., 01 or 1) %y 2-digit year %Y 4-digit year %a abbreviated weekday %A unabbreviated weekday %b abbreviated month %B unabbreviated month
 
@@ -145,9 +145,9 @@ Remember formatting of dates in R:
 # (code must be uncommented)
 today <- Sys.Date()
 format(today, format = "%B")
-#format(today, format = "")
-#format(today, format = "")
-#format(today, format = "")
+#format(today, format = "%b")
+#format(today, format = "%Y")
+#format(today, format = "%y")
 
 ```
 
@@ -164,7 +164,7 @@ library(lubridate)
 #Ex1
 str_today <- "2023-feb-7"
 #Since the format is year-month-day we will use function ymd()
-date_obj_today <- ymd(str_today)
+date_obj_today <- ymd(str_today) #will show up in env. without "" meaning it's numerical now
 date_obj_today
 
 #Ex2
@@ -175,18 +175,20 @@ date_obj_today
 
 #Ex_3 - on your own...
 str_juneteenth <- "19 June 1865"
-#Since the format is month-day-year we will use function mdy()
-#date_juneteenth <- ()
-#date_juneteenth
+#Since the format is day-month-year we will use function dmy()
+date_juneteenth <- dmy(str_juneteenth)
+date_juneteenth
 ```
 
 ```{r DateExercise2}
 #century issue
+#if year is only 2 digits, it might not be the correct century
 str_past <- "55-feb-3"
 date_obj_past <- ymd(str_past)
 date_obj_past
 
 #Build a function to fix year that is more general than the one discussed in the lesson
+#function will show up below values
 fix.early.dates <- function(d, cutoff) {
        m <- year(d) %% 100  #operator %% is a modular division i.e. integer-divide year(d) by 100 and returns the remainder 
        year(d) <- ifelse(m > cutoff, 1900+m, 2000+m)  #this will update year(d), year() is a function that returns the year for a data object
@@ -200,11 +202,11 @@ fixed_date_obj_past
 ```{r centuryfix}
 #Fix for century issue
 str_past <- "55-feb-3"
-#Alternative 1
+#Alternative 1 - fast_strptime(), must specify format, and cutoff date
 date_obj_past <- fast_strptime(str_past,"%y-%b-%d",cutoff_2000=23L)
 date_obj_past
 
-#Alternative 2
+#Alternative 2 - use parse_date_time2() cutoff is the current year we are in
 date_obj_past2 <- parse_date_time2(str_past,"ymd",cutoff_2000=23L)
 date_obj_past2
 
