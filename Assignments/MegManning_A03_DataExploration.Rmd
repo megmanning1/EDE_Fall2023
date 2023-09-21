@@ -57,26 +57,31 @@ View(Litter)
 
 3.  The Niwot Ridge litter and woody debris dataset was collected from the National Ecological Observatory Network, which collectively includes 81 aquatic and terrestrial sites across 20 ecoclimatic domains. 32 of these sites sample forest litter and woody debris, and we will focus on the Niwot Ridge long-term ecological research (LTER) station in Colorado. Why might we be interested in studying litter and woody debris that falls to the ground in forests? Feel free to do a brief internet search if you feel you need more background information.
 
-> Answer:
+> Answer: Litter and woody debris can act as a nursery ground for other organisms to grow. One example is a nursery log that you can typically find in forests in the Pacific Northwest. Trees that fall in old growth forests provide nutrients and space for other plants and fungi to grow. Litter and woody debris are key parts of forest ecosystems. In this case, they can also give insight into forest decay rates.
 
 4.  How is litter and woody debris sampled as part of the NEON network? Read the NEON_Litterfall_UserGuide.pdf document to learn more. List three pieces of salient information about the sampling methods here:
 
 > Answer: 
- 1.
- 2.
- 3. 
+ 1. Fine wood debris is collected in ground traps 
+ 2. Litter is collected in elevated PVC litter traps have a mesh "basket" located ~80cm from ground
+ 3. Sampling only occurs in tower plots which are randomly selected and trap placement within plots may either be targeted or randomized, depending on the vegetation
 
 ## Obtain basic summaries of your data (Neonics)
 
 5.  What are the dimensions of the dataset?
 
 ```{r}
+#use dim() to see the dimensions of both datasets
+dim(Litter)
+dim(Neonics)
 
 ```
 
 6.  Using the `summary` function on the "Effect" column, determine the most common effects that are studied. Why might these effects specifically be of interest?
 
 ```{r}
+#use summary paired with a $ to point to the Effect column to see the summary stats for this column
+summary(Neonics$Effect)
 
 ```
 
