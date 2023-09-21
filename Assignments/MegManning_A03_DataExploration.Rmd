@@ -85,85 +85,114 @@ summary(Neonics$Effect)
 
 ```
 
-> Answer:
-
+> Answer: These effects could be specifically of interest beause it is giving important information about the overall sample mortality, physiology, reproduction, etc., which are important metrics for better understanding the effect of neonicotinoid insecticides on the types of insects they're studying. 
 
 7.  Using the `summary` function, determine the six most commonly studied species in the dataset (common name). What do these species have in common, and why might they be of interest over other insects? Feel free to do a brief internet search for more information if needed.[TIP: The `sort()` command can sort the output of the summary command...]
 
 ```{r}
-
+#use summary function $Species.Common.Name, 6 to see the top 6 results for most commons species 
+summary(Neonics$Species.Common.Name, 6)
 ```
 
-> Answer:
+> Answer: The top 6 most common species in order are Honey Bee, Parasitic Wasp, Tailed Bumblebee, Carnionlan Honey Bee, and Bumble Bee. All of these species are types of bees. This is of interest over other insects because bees are keystone species for ecosystem management and sustainability. 
 
 8.  Concentrations are always a numeric value. What is the class of `Conc.1..Author.` column in the dataset, and why is it not numeric?
 
 ```{r}
+#find the class of the Conc.1..Author
+class(Neonics$Conc.1..Author.)
 
 ```
 
-> Answer:
+> Answer: It is not numeric because some of the values in that column are not numeric values. 
 
 ## Explore your data graphically (Neonics)
 
 9.  Using `geom_freqpoly`, generate a plot of the number of studies conducted by publication year.
 
 ```{r}
+#create a plot of the number of studies conducted by publication year
+ggplot(Neonics) +
+  geom_freqpoly(aes(x = Publication.Year), bins = 20)
 
 ```
 
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
 
 ```{r}
+#add a color aesthetic for each Test.Location (change the aesthetics)
+ggplot(Neonics) +
+  geom_freqpoly(aes(x = Publication.Year, color = Test.Location), bins = 20)
 
 ```
 
 Interpret this graph. What are the most common test locations, and do they differ over time?
 
-> Answer:
+> Answer: The most common test locations are in a Lab. As shown in the graph, the overall count of Lab test locations appears to be much higher than the other three options. The second most common locations seem to be Field Natural. Over time both Lab and Field Natural locations seem to go up in the early 2000s and then decline steeply around either 2010 or just after. Around 2020 the number of location sites for all four places seems to be around the same as in 1990. 
 
 11. Create a bar graph of Endpoint counts. What are the two most common end points, and how are they defined? Consult the ECOTOX_CodeAppendix for more information. 
 
 [**TIP**: Add `theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))` to the end of your plot command to rotate and align the X-axis labels...]
 
 ```{r}
+#create a bar graph
+ggplot(Neonics) +
+  geom_bar(aes(x = Endpoint), bins = 20) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 ```
 
-> Answer:
+> Answer: The two most common endpoints are LOEL and NOEL. In terms of the chemical grade and standards code the -EL means Electrophoresis Grade which is defined as material used specifically for electrophoresis applications.    
 
 ## Explore your data (Litter)
 
 12. Determine the class of collectDate. Is it a date? If not, change to a date and confirm the new class of the variable. Using the `unique` function, determine which dates litter was sampled in August 2018.
 
 ```{r}
+#check the class of the date 
+class(Litter$collectDate)
 
+#convert from factor to date
+Litter$collectDate <- as.Date(Litter$collectDate, format = "%Y%m%d")
+
+#check saved as date
+class(Litter$collectDate)
 ```
 
 13. Using the `unique` function, determine how many plots were sampled at Niwot Ridge. How is the information obtained from `unique` different from that obtained from `summary`?
 
 ```{r}
-
+#find how many plots were sampled at Niwot Ridge
+unique(Litter$plotID)
+summary(Litter$plotID)
 ```
 
-> Answer:
+> Answer: The difference between the two functions is that the unique() function provides the number of sites at Niwot Ridge, but it does not tell you how many plots were sampled at each site at Niwot Ridge. The summary function provides each location and the number of samples at each site. 
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
 ```{r}
-
+#create a bar graph of functionalGroup
+ggplot(Litter) +
+  geom_bar(aes(x = functionalGroup))
 ```
 
 15. Using `geom_boxplot` and `geom_violin`, create a boxplot and a violin plot of dryMass by functionalGroup.
 
 ```{r}
+#create a boxplot of dryMass by functionalGroup
+ggplot(Litter) +
+  geom_boxplot(aes(x = dryMass, color = functionalGroup))
 
+#create a violin plot 
+ggplot(Litter) +
+  geom_violin(aes(x = dryMass, y = functionalGroup))
 ```
 
 Why is the boxplot a more effective visualization option than the violin plot in this case?
 
-> Answer:
+> Answer: The box plot is better because it gives you the quick statistics for items in each functional group, allowing us to see things like median, IQR, and outliers. The violin plot looks at the distribution of the data, which is harder in this case to see what each functional group looks like without zooming in to each.  
 
 What type(s) of litter tend to have the highest biomass at these sites?
 
-> Answer:
+> Answer: The types of litter that have the highest biomass is by far needles. Using the boxplot as a reference, we can see that the median is significantly high that all of the other types of litter. The second most appears to be the "mixed" type. However, the twigs/branches have an outlier that is shown to be above the median of both the needles and mixed biomass types. 
