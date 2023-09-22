@@ -19,30 +19,39 @@ Today we will work with a dataset from the [North Temperate Lakes Long-Term Ecol
 
 Opening discussion: why might we be interested in long-term observations of temperature, oxygen, and light in lakes?
 
-> Add notes here: 
+> Add notes here: Chemical and physical limnology for lakes - we have onservations in temp, oxygen, and light. This is interesting because it tells us about the health and turn over of a lake system. 
 
 ```{r setup workspace, message = FALSE}
 getwd()
 #install.packages(tidyverse)
+install.packages("tidyverse")
 library(tidyverse)
 #install.packages(lubridate)
 library(lubridate)
+#stringAsFactor = TRUE, summary will work for characters**
 NTL.phys.data <- read.csv("./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv", stringsAsFactors = TRUE)
 
+#Check data was imported correctly
 colnames(NTL.phys.data)
-head(NTL.phys.data)
+head(NTL.phys.data) #dataset that is recorded at different depths, so it will have different entries for each column (why there are so many dates that are same)
 summary(NTL.phys.data)
-str(NTL.phys.data)
+str(NTL.phys.data) #what type of data is each column? #tells us the date is a factor not a date object
 dim(NTL.phys.data)
 
 class(NTL.phys.data$sampledate)
 # Format sampledate as date
 NTL.phys.data$sampledate <- as.Date(NTL.phys.data$sampledate, format = "%m/%d/%y")
+#check is it a date?
+class(NTL.phys.data$sampledate)
+#using head function shows us all the dates in that column to make sure that dates aren't wonky
+head(NTL.phys.data$sampledate)
 ```
 
 ## Data Wrangling
 
 Data wrangling extends data exploration: it allows you to process data in ways that are useful for you. An important part of data wrangling is creating *tidy datasets*, with the following rules: 
+
+Rule of thumb for tidy datasets:
 
 1. Each variable has its own column
 2. Each observation has its own row
@@ -54,8 +63,23 @@ What is the best way to wrangle data? There are multiple ways to arrive at a spe
 
 `dplyr` is a package in R that includes functions for data manipulation (i.e., data wrangling or data munging). `dplyr` is included in the tidyverse package, so you should already have it installed on your machine. The functions act as verbs for data wrangling processes. For more information, run this line of code:
 
+--> This is one strategy for wrangling functions - use whatever is cleanest and makes sense to you!
+
 ```{r, results = "hide"}
+#shows you what the package dplyr will do --> look Single table verbs section (particularly helpful)
 vignette("dplyr")
+
+#When you want to filter rows
+#filter() - chooses rows based on column values
+#slice() - chooses rows based on location
+#arrange() - changes the order of the rows
+
+#Columns
+#select() - changes whether or not a column is included
+#rename() - changes the names of columns
+#mutate() - changes the values of columns and creates new columns
+#relocate() - changes the order of the columns
+
 ```
 
 ### Filter
@@ -63,24 +87,30 @@ vignette("dplyr")
 Filtering allows us to choose certain rows (observations) in our dataset.
 
 Here are the relevant commands used in the `filter` function. Add some notes to designate what these commands mean. 
-`==`
-`!=`
-`<`
-`<=`
-`>`
-`>=`
-`&`
-`|`
+`==` -- compare value to a specific value
+`!=` -- if variables are different
+`<` -- less than a number
+`<=` -- less than or equal to
+`>` -- greater than
+`>=` -- greater than or equal
+`&` -- multiple conditions to check aggregate with &
+`|` -- if you want both conditions to be true 
 
 ```{r filtering data}
-class(NTL.phys.data$lakeid)
+class(NTL.phys.data$lakeid) 
+#you can only compare character with character, numeric with numeric 
 class(NTL.phys.data$depth)
 
 # matrix filtering
+#want to look at surface information
+#filtering rows that have element 0 on column depth (== 0)
 NTL.phys.data.surface1 <- NTL.phys.data[NTL.phys.data$depth == 0,]
 
 # dplyr filtering
+#how to filter just depths at 0 using dplyr
+#first argument is dataset, 2nd argument is whatever you're filtering with the condition == 0
 NTL.phys.data.surface2 <- filter(NTL.phys.data, depth == 0)
+#you want depth above 0.25 or values that will be less than 0.25
 NTL.phys.data.surface3 <- filter(NTL.phys.data, depth < 0.25)
 
 # Did the methods arrive at the same result?
@@ -91,20 +121,41 @@ dim(NTL.phys.data.surface2)
 head(NTL.phys.data.surface3)
 dim(NTL.phys.data.surface3)
 
-# Choose multiple conditions to filter
+# Choose multiple conditions to filter in one line
+#number of occurrences of lake names - you can see the names that have the most
 summary(NTL.phys.data$lakename)
+
+#let's select just the top 2 lakes for further analysis
+#using filter function with original data, using the two lakenames == to set the ones you want, and then using | as an "or" 
 NTL.phys.data.PeterPaul1 <- filter(NTL.phys.data, lakename == "Paul Lake" | lakename == "Peter Lake")
+
+#Method 2 --> could also check when the data isn't what you're looking at (i.e. excluding the other lakes we don't want to look at) 
+#use ! to exclude the lakes
 NTL.phys.data.PeterPaul2 <- filter(NTL.phys.data, lakename != "Central Long Lake" & 
                                      lakename != "Crampton Lake" & lakename != "East Long Lake" &
                                      lakename != "Hummingbird Lake" & lakename != "Tuesday Lake" &
                                      lakename != "Ward Lake" & lakename != "West Long Lake")
+
+#Method 3
+#useful when you need to select more than 2 elements 
+#Instead of writing lakename == a lot, you can write lakename %in% and create a vector with all of the names you want
 NTL.phys.data.PeterPaul3 <- filter(NTL.phys.data, lakename %in% c("Paul Lake", "Peter Lake"))
 
 # Choose a range of conditions of a numeric or integer variable
+#maybe you want days from June to October 
+#Open data set and see at which number (day) do the data start where you want (i.e. 151 or 305)
 summary(NTL.phys.data$daynum)
+#152 is first day of June so > 151
+#Use & because we want to say both 152 and it's less than 305
 NTL.phys.data.JunethruOctober1 <- filter(NTL.phys.data, daynum > 151 & daynum < 305)
+
+#comma is same thing as &
 NTL.phys.data.JunethruOctober2 <- filter(NTL.phys.data, daynum > 151, daynum < 305)
+
+#if you want to use >= you can start at 152 and <= 304
 NTL.phys.data.JunethruOctober3 <- filter(NTL.phys.data, daynum >= 152 & daynum <= 304)
+
+#also use the %in% to look at just the days in between the values we want by creating a vector of the values between 152:304
 NTL.phys.data.JunethruOctober4 <- filter(NTL.phys.data, daynum %in% c(152:304))
 
 # Exercise: 
