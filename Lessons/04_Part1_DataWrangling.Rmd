@@ -177,7 +177,10 @@ Question: Why don't we filter using row numbers?
 Arranging allows us to change the order of rows in our dataset. By default, the arrange function will arrange rows in ascending order.
 
 ```{r arranging data}
+#need to specify which column you want to arrange by
 NTL.phys.data.depth.ascending <- arrange(NTL.phys.data, depth)
+
+#arrange in decending order - change second argument to desc (descending) with the column you want descending
 NTL.phys.data.depth.descending <- arrange(NTL.phys.data, desc(depth))
 
 # Exercise: 
@@ -191,6 +194,10 @@ NTL.phys.data.depth.descending <- arrange(NTL.phys.data, desc(depth))
 Selecting allows us to choose certain columns (variables) in our dataset.
 
 ```{r selecting columns}
+#allows us to choose certain columns in our dataset 
+#create a new data frame 
+#if we are just worried about the lakename and what the temperature is at those lakes - pulling out a set of data, lakename and everything that ranges in between sampledate and temperature_c
+#can pull out a subset of data to make analysis easier
 NTL.phys.data.temps <- select(NTL.phys.data, lakename, sampledate:temperature_C)
 
 ```
@@ -199,6 +206,9 @@ NTL.phys.data.temps <- select(NTL.phys.data, lakename, sampledate:temperature_C)
 Mutating allows us to add new columns that are functions of existing columns. Operations include addition, subtraction, multiplication, division, log, and other functions.
 
 ```{r mutating data}
+#say we want to include a new column that has temp but on new unit #say add temp but in Fahrenheit 
+#whatever is on left of = is name of new column 
+#if there isn't a temp available it will say N/A in column
 NTL.phys.data.temps <- mutate(NTL.phys.data.temps, temperature_F = (temperature_C*9/5) + 32)
 
 ```
@@ -208,13 +218,24 @@ NTL.phys.data.temps <- mutate(NTL.phys.data.temps, temperature_F = (temperature_
 A package that makes coercing date much easier is `lubridate`. A guide to the package can be found at https://lubridate.tidyverse.org/. The cheat sheet within that web page is excellent too. This package can do many things (hint: look into this package if you are having unique date-type issues), but today we will be using two of its functions for our NTL dataset. 
 
 ```{r using lubridate}
+#going to extract just a month from a date object - useful if you want to aggregate data by month or summary by month 
+
 # add a month column to the dataset
+#month() adds a month
 NTL.phys.data.PeterPaul1 <- mutate(NTL.phys.data.PeterPaul1, month = month(sampledate)) 
 
 # reorder columns to put month with the rest of the date variables
+#let's put month next to the rest of the date information
+#select() can also change order of columns 
+#figure out where you want month to go (right after daynum)
+#select(dataset, columns before new column, data/columns after new column)
 NTL.phys.data.PeterPaul1 <- select(NTL.phys.data.PeterPaul1, lakeid:daynum, month, sampledate:comments)
 
 # find out the start and end dates of the dataset
+#interval() - can check what the first and last objects
+
+#CONFUSED ON THIS?? CAN WE GO OVER AGAIN?
+
 interval(NTL.phys.data.PeterPaul1$sampledate[1], NTL.phys.data.PeterPaul1$sampledate[21613])
 interval(first(NTL.phys.data.PeterPaul1$sampledate), last(NTL.phys.data.PeterPaul1$sampledate))
 ```
@@ -222,11 +243,19 @@ interval(first(NTL.phys.data.PeterPaul1$sampledate), last(NTL.phys.data.PeterPau
 
 ## Pipes
 
+--> Helpful because you don't have to keep specifying the dataset
+
 Sometimes we will want to perform multiple functions on a single dataset on our way to creating a processed dataset. We could do this in a series of subsequent functions or create a custom function. However, there is another method to do this that looks cleaner and is easier to read. This method is called a pipe. We designate a pipe with `%>%`. A good way to think about the function of a pipe is with the word "then." 
 
 Let's say we want to take our raw dataset (NTL.phys.data), *then* filter the data for Peter and Paul lakes, *then* select temperature and observation information, and *then* add a column for temperature in Fahrenheit: 
 
 ```{r using pipes}
+#%>% can be replaced with the word "then"
+#create new dataframe (data.processed)
+#start from original data NTL.phys.data
+#filter() - the two lakes we're looking at 
+#select() - the columns we want (lakename and sampledate:temperature_c)
+#and then we want to create a new column mutate() - for temp in F
 NTL.phys.data.processed <- 
   NTL.phys.data %>%
   filter(lakename == "Paul Lake" | lakename == "Peter Lake") %>%
@@ -239,12 +268,18 @@ Notice that we did not place the dataset name inside the wrangling function but 
 
 ### Saving processed datasets
 
+As soon as you create a processed data set you should save it as a .csv
+
 ```{r exporting data}
+#use write.csv() to make a new .csv file 
 write.csv(NTL.phys.data.PeterPaul1, row.names = FALSE, file = "./Data/Processed/NTL-LTER_Lake_ChemistryPhysics_PeterPaul_Processed.csv")
 ```
 
 ## Closing Discussion
 
 When we wrangle a raw dataset into a processed dataset, we create a code file that contains only the wrangling code. We then save the processed dataset as a new spreadsheet and then create a separate code file to analyze and visualize the dataset. Why do we keep the wrangling code separate from the analysis code?
+
+-> we don't want to do everything in the same document because we'll have a really rmd file and it's a good way to practice having a clean practice to wrangle and process data
+--> creates cleaner rscripts - better for reproducibility
 
 
