@@ -10,16 +10,20 @@ editor_options:
 
 ```{r setup}
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
-#Read packages
+#Read packages 
+#doing it on one line separated by semi-colons
 library(tidyverse);library(lubridate); library(here)
 
 #Read in data, don't convert strings to factors
-sites <- read.csv(here('Data/Raw/NWIS_SiteFlowData_NE_Raw.csv'))
+#here() - is a good function to find your working directory and easy way to load data
+#didn't read in stringsAsFactors (so you can see that there are characters in the environment tab)
+sites <- read.csv(here('Data/Raw/NWIS_SiteFlowData_NE_RAW.csv'))
 dim(sites)
 
 #Convert date column to date object
+#another function to use to convert characters to dates --> yearsmonthday_hoursminutesseconds (ymd_hms)
+#POSIXct is an internal format
 sites$date <- ymd_hms(sites$date)
-
 ```
 
 
@@ -28,15 +32,18 @@ sites$date <- ymd_hms(sites$date)
 ```{r create and explore days of week column}
 
 #Compute the day of the week each sample was collected
+#wday returns the day of the week
+#4 = Wednesday (Sunday, Monday, Tuesday, Wednesday)
 sites$dow <- wday(sites$date)
 
 ## What class is the dow column?
 class(sites$dow)
 
 #List the unique values in the column
+#tells you which days the data was collected
 unique(sites$dow)
 
-#Summary - is it meaningful?
+#Summary - is it meaningful? --> not really because not all values are numbers (as in 4 = Wednesday so taking mean doesn't really make sense)
 summary(sites$dow)
 
 ```
@@ -44,7 +51,7 @@ summary(sites$dow)
 ## Convert the days of the week to a factor
 ```{r convert dow column to factor and explore}
 
-#Convert to a factor
+#Convert to a factor - overriding column values as factors 
 sites$dow <- factor(sites$dow)
 
 ## What class is the dow column now?
@@ -53,7 +60,7 @@ class(sites$dow)
 #List the unique values in the column
 unique(sites$dow)
 
-#Summary - is it meaningful?
+#Summary - is it meaningful? -- will give you list of unique values and counts which is useful here because we're grouping the values of same numbers together (as in not numerically computing mean, seeing how many of those numbers are present)
 summary(sites$dow)
 
 #Show the levels associated with our factor column
@@ -75,12 +82,15 @@ ggplot(sites,aes(x=dow)) +
 
 ```{r add levels to our data}
 #Update the levels to include all seven days of the week (note we have to start with existing levels)
+#this is useful because maybe we want to see all days of the week regardless of if there is data for each day
+#levels function here is just adding 1, 2, 6, 7 (days) into the column with days of week
 levels(sites$dow) <- c(levels(sites$dow),"1","2","6","7")
 
 #Confirm the change
 levels(sites$dow)
 
 #Plot again
+#scale_x_discrete(drop=FALSE) --> basically saying don't drop values that have 0
 ggplot(sites,aes(x=dow)) +
   geom_bar() + 
   scale_x_discrete(drop=FALSE)
@@ -91,6 +101,7 @@ We now have all days of the week, but the order is incorrect. Also, we have day 
 ```{r reorder and rename levels}
 
 #Reorder by overwriting the column with the existing values assigned with a new order of levels
+#levels=c("1","2","3","4","5","6","7")) #Or... as.character(seq(1,7)) just wrangling them to be in order 
 sites$dow <- factor(sites$dow, levels=c("1","2","3","4","5","6","7")) #Or... as.character(seq(1,7))
 
 #See that the levels are updated
@@ -102,6 +113,7 @@ ggplot(sites,aes(x=dow)) +
   scale_x_discrete(drop=FALSE)
 
 #Add **labels** to our factors
+#good example of tidy code = break code across lines
 sites$dow <- factor(
   sites$dow, 
   levels=c("1","2","3","4","5","6","7"),
@@ -117,3 +129,6 @@ ggplot(sites,aes(x=dow)) +
 ```
 
 ## An exercise for you: see if you can plot the number of samples recorded each month
+
+```{r practice}
+

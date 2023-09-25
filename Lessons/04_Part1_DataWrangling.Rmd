@@ -24,7 +24,7 @@ Opening discussion: why might we be interested in long-term observations of temp
 ```{r setup workspace, message = FALSE}
 getwd()
 #install.packages(tidyverse)
-install.packages("tidyverse")
+#install.packages("tidyverse")
 library(tidyverse)
 #install.packages(lubridate)
 library(lubridate)
@@ -160,11 +160,23 @@ NTL.phys.data.JunethruOctober4 <- filter(NTL.phys.data, daynum %in% c(152:304))
 
 # Exercise: 
 # filter NTL.phys.data for the year 1999
+NTL.phys.data$year4
+NTL.phys.data.1999 <- filter(NTL.phys.data, NTL.phys.data$year4 == 1999)
+
+
+# filter NTL.phys.data for Tuesday Lake from 1990 through 1999.
+NTL.phys.data.Tuesday <- dplyr::filter(NTL.phys.data, lakename == "Tuesday Lake" &
+year4 >= 1990 & year4 <= 1999)
+
+
 # what code do you need to use, based on the class of the variable?
 class(NTL.phys.data$year4)
 
+#dpylr filtering
+NTL.phys.data.surface <- filter(NTL.phys.data, depth == 0)
+
 # Exercise: 
-# filter NTL.phys.data for Tuesday Lake from 1990 through 1999.
+
 
 
 ```
