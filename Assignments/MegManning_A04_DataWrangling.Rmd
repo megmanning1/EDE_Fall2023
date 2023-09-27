@@ -164,14 +164,11 @@ EPAair_summary <- EPAair_spread %>%
             meanAQI_PM25 = mean(PM2.5)) %>%
   drop_na(meanAQI_ozone)
 
-
 #13 dimensions of dataset 
 
 dim(EPAair_summary)
-
-
 ```
 
 14. Why did we use the function `drop_na` rather than `na.omit`?
 
-> Answer: 
+> Answer: When you use drop_na it drops just the NA values of the argument that you specify whereas na.omit omits all of the NA values within your data frame. 
