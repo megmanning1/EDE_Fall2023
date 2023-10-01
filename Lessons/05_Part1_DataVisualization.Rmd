@@ -19,9 +19,11 @@ Effective data visualization depends on purposeful choices about graph types. Th
 ## Set Up
 
 ```{r, message = FALSE, warning = FALSE}
+getwd()
 library(tidyverse);library(lubridate);library(here)
 library(ggridges)
-
+#install.packages("ggridges") 
+#ridge plots help look at distribution of variable over time
 here()
 
 PeterPaul.chem.nutrients <- 
