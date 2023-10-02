@@ -80,7 +80,8 @@ processed_data = "Data/Processed_KEY"
 
 #Read in data
 PeterPaul.chem.nutrients <- read.csv(
-  here(processed_data,"NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"),
+  here(processed_data,
+       "NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"),
   stringsAsFactors = TRUE)
 
 EPAair <- read.csv(
@@ -175,9 +176,10 @@ surface_temp_1999_plot +
   scale_color_wsj()
 
 #Add a title
+#change name of legend labs()
 surface_temp_1999_plot + 
   ggtitle("Surface temperature, 1999") +
-  labs(color='Lake') + 
+  labs(color='Lake') +
   theme_wsj()
 ```
 
@@ -248,18 +250,44 @@ Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 ```{r, fig.height = 3, fig.width = 4, warning = FALSE}
 
 # 1. 
-# Plot surface temperatures by day of  year. 
+# Plot surface temperatures (x) by day of  year (y). 
 # Color your points by year, and facet by lake in two rows.
 # Change the ylab name
 
+#filter dataset for surface temp of lakes -- plotted it but wrong filter of data...
+PeterPaul.visuals <- PeterPaul.chem.nutrients %>%
+  filter(!is.na(temperature_C)) %>%
+  group_by(lakename, daynum)
+
+PeterPaul.temp_by_daynum <- ggplot(PeterPaul.visuals, aes(x = daynum, y = temperature_C, as.factor(color = year4))) +
+                                     geom_point()+
+  facet_wrap(vars(lakename), nrow = 2) +
+  labs(y = "surface temperature")
+print(PeterPaul.temp_by_daynum)
+
+#doing it together...
+#can filter inside ggplot
+ggplot(filter(PeterPaul.chem.nutrients, depth == 0),
+       aes(x = daynum,
+           y = temperature_C,
+           as.factor(color = year4))) +
+  geom_point()+
+  facet_wrap(vars(lakename))+
+  labs(y = "surface temperature")
+
 
 #2. 
-# Plot temperature by date. Color your points by depth.
+# Plot temperature (y) by date (x). Color your points by depth.
 # Change the size of your point to 0.5
-# Change the color palette to magma and play with direction (+- 1), which one makes more sense?
-# Change x axis to include marker/labels every 5 years
-
-
+# Change the color palette to magma and play with direction (+- 1), which one makes more sense? (-1 makes more sense because it shows darker color as more depth)
+# Change x axis to include marker/labels every 5 years - use scale_x_date because our x is a date
+ggplot(PeterPaul.chem.nutrients,
+       aes(x = sampledate,
+           y = temperature_C,
+           color = depth)) +
+  geom_point(size = 0.5)+
+  scale_color_viridis(option = "magma", direction = -1)+
+  scale_x_date(date_breaks = "5 years",date_labels = "%Y")
 
 ```
 ## Plotting the relationship between two continuous variables: Scatterplot
@@ -273,8 +301,13 @@ Exercise: Plot relationships between air quality measurements
 # Make the points 50 % transparent
 # Add a line of best fit for the linear regression of these variables.
 
-
-
+ggplot(EPAair,
+       aes(x = PM2.5,
+           y = Ozone,
+           color = mean_Lat))+
+  geom_point(alha=0.5)+
+  #scale_color_viridis(name="Latitude", option = "viridis", direction = -1)+
+  geom_smooth(method = lm)
 
 ```
 
