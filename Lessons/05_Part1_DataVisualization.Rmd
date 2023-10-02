@@ -202,13 +202,16 @@ Nutrientplot4 <-
                stackdir = "center", position = "dodge", dotsize = 2) #stacking direction in the center and position = "dodge" is bascially not overlaying of dots, and dotsize is size of dots printed
 print(Nutrientplot4)
 
-# Violin plot
+# Violin plot -- also shows you a rotated density plot 
 Nutrientplot5 <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(x = lakename, y = concentration)) +
   geom_violin(aes(color = nutrient)) #
 print(Nutrientplot5)
+
 # Frequency polygons
 # Using a tidy dataset
+# specify what you want on each axis and the color you want for the polygon
+# not a good way to generate freq plot (long code and no legend)
 Nutrientplot6 <-
   ggplot(PeterPaul.chem.nutrients) +
   geom_freqpoly(aes(x = tn_ug), color = "darkred") +
@@ -219,6 +222,8 @@ Nutrientplot6 <-
 print(Nutrientplot6)
 
 # Using a gathered dataset
+# much better way to create a freq plot
+#color inside aesthetics gives you legend
 Nutrientplot7 <-   
   ggplot(PeterPaul.chem.nutrients.gathered) +
   geom_freqpoly(aes(x = concentration, color = nutrient))
@@ -228,6 +233,7 @@ print(Nutrientplot7)
 # See <https://www.data-to-viz.com/caveat/spaghetti.html> for more info.
 
 # Ridgeline plot
+#use fill to fill below the curve of the frequency plot (using color would color the line not under the curve)
 Nutrientplot6 <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(y = nutrient, x = concentration)) +
   geom_density_ridges(aes(fill = lakename), alpha = 0.5) #

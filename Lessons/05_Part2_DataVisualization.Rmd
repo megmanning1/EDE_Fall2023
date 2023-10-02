@@ -27,6 +27,7 @@ PeterPaul.chem.nutrients.gathered <-
 EPAair <- read.csv(here("Data/Processed_KEY/EPAair_O3_PM25_NC1819_Processed.csv"),
                    stringsAsFactors = T)
 
+#changing date to a date not a factor
 EPAair$Date <- ymd(EPAair$Date)
 PeterPaul.chem.nutrients$sampledate <- ymd(PeterPaul.chem.nutrients$sampledate)
 PeterPaul.chem.nutrients.gathered$sampledate <- ymd(PeterPaul.chem.nutrients.gathered$sampledate)
@@ -45,16 +46,19 @@ O3plot1 <- ggplot(EPAair) +
   theme_gray()
 print(O3plot1)
 
+#axis are black background is white
 O3plot2 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone)) +
   theme_bw()
 print(O3plot2)
 
+#gray lines and axis background white
 O3plot3 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone)) +
   theme_light()
 print(O3plot3)
 
+#no grid lines (background is white, lines are black)
 O3plot4 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone)) +
   theme_classic()
@@ -70,9 +74,11 @@ Notice that some aspects of your graph have not been adjusted, including:
 If you would like to set a common theme across all plots in your analysis session, you may define a theme and call up that theme for each graph. This eliminates the need to add multiple lines of code in each plot. 
 
 ```{r, fig.height = 3, fig.width = 4, warning = FALSE}
+#define own theme
+# based on theme_classic but changing font size for labels and change text elements
 mytheme <- theme_classic(base_size = 14) +
   theme(axis.text = element_text(color = "black"), 
-        legend.position = "top") #alternative: legend.position + legend.justification
+        legend.position = "top") #alternative: legend.position + legend.justification (alignment: right, center, left)
 
 # options: call the theme in each plot or set the theme at the start. 
 
@@ -81,7 +87,7 @@ O3plot5 <- ggplot(EPAair) +
   mytheme
 print(O3plot5)  
 
-theme_set(mytheme)
+theme_set(mytheme) #set theme for all subsequent plots before running other plots and then you don't have to include theme in subsequent plots
 
 O3plot6 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone))
@@ -102,8 +108,8 @@ O3plot7 <- ggplot(EPAair, aes(x = Date, y = Ozone)) +
   geom_text(x = as.Date("2020-01-01"), y = 95, label = "moderate", hjust = 1, fontface = "bold") +
   geom_text(x = as.Date("2020-01-01"), y = 120, label = "unhealthy (sensitive groups)", hjust = 1, fontface = "bold") +
   scale_x_date(limits = as.Date(c("2018-01-01", "2019-12-31")), 
-    date_breaks = "2 months", date_labels = "%b %y") +
-  ylab(expression("O"[3]* " AQI Value")) +
+    date_breaks = "2 months", date_labels = "%b %y") + #%b means abr. format of month
+  ylab(expression("O"[3]* " AQI Value")) + #expression() means subscript
   theme(axis.text.x = element_text(angle = 45,  hjust = 1))
 print(O3plot7)  
 
@@ -152,9 +158,9 @@ nationalparkcolors (package)
 * https://github.com/katiejolly/nationalparkcolors
 
 ```{r, warning = FALSE}
-# install.packages("viridis")
-# install.packages("RColorBrewer")
-# install.packages("colormap")
+#install.packages("viridis")
+#install.packages("RColorBrewer")
+#install.packages("colormap")
 library(viridis)
 library(RColorBrewer)
 library(colormap)
@@ -175,18 +181,19 @@ print(NvsP)
 NvsP2 <-
   ggplot(PeterPaul.chem.nutrients, aes(x = tp_ug, y = tn_ug, color = depth, shape = lakename)) +
   geom_point(alpha = 0.7, size = 2.5) +
-  #labs() + # change your legend labels here
+  labs(color = "Depth", shape = "Lake Name", y = "Concentration in Micrograms per liter") + # change your legend labels here
   scale_shape_manual(values = c(15, 17)) +
-  #scale_color_distiller(palette = "Blues", direction = 1) + # use scale_color_brewer for discrete variables
+  scale_color_distiller(palette = "Blues", direction = 1) + # use scale_color_brewer for discrete variables
   scale_color_viridis(option = "magma", direction = -1) +
   theme(legend.position = "right", 
         legend.text = element_text(size = 12), legend.title = element_text(size = 12))
 print(NvsP2)
 
 # change your y axis label to list concentration in micrograms per liter
-# remove your x axis label
+# remove your x axis label - HOW DO YOU DO THIS?
 # change labels for nutrients in the legend
 # try out the different color palette options and choose one (or edit)
+
 Nutrientplot <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(x = lakename, y = concentration, color = nutrient)) +
   geom_boxplot() +
@@ -208,7 +215,7 @@ A useful guide for aligning plots by axis can be found here: https://wilkelab.or
 ```{r, fig.height = 7, fig.width = 6}
 #install.packages("cowplot")
 library(cowplot)
-plot_grid(NvsP2, Nutrientplot, nrow = 2, align = 'h', rel_heights = c(1.25, 1))
+plot_grid(NvsP2, Nutrientplot, nrow = 2, align = 'h', rel_heights = c(1.25, 1)) #rel_heights is relative heights and resizes the plots to fit on same page
 
 ```
 
