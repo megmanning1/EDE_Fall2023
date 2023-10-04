@@ -41,9 +41,12 @@ here()
 
 #read in data
 NTL_LTER_processed <- read.csv(
-  "./Data/Processed_Key/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv")
+  "./Data/Processed_Key/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv",
+  stringsAsFactors = TRUE)
+
 Niwot_Ridge_processed <- read.csv(
-  "./Data/Processed_Key/NEON_NIWO_Litter_mass_trap_Processed.csv")
+  "./Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv",
+  stringsAsFactors = TRUE)
 
 #2 check date
 class(NTL_LTER_processed$sampledate)
@@ -85,14 +88,16 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 4. [NTL-LTER] Plot total phosphorus (`tp_ug`) by phosphate (`po4`), with separate aesthetics for Peter and Paul lakes. Add a line of best fit and color it black. Adjust your axes to hide extreme values (hint: change the limits using `xlim()` and/or `ylim()`).
 
 ```{r plot total P vs PO4}
-#4 Total phosphorus (tp_ug) by phosphate (po4) --> RUNNING INTO ISSUES WITH NAS?
-ggplot(NTL_LTER_processed, aes(x = "po4", 
-           y = "tp_ug", color = lakename)) +
+#4 Total phosphorus (tp_ug) by phosphate (po4)
+ggplot(NTL_LTER_processed, aes(x = po4, 
+           y = tp_ug, color = lakename)) +
   geom_point() +
   geom_smooth(method = lm, color = "black") +
-  xlim()+
-  ylim()
-
+  labs(y = "Total Phosphorus", 
+       x = "Phosphate", 
+       color = "Lake")+
+  xlim(0, 50) +
+  ylim(0, 150)
 ```
 
 
@@ -108,9 +113,10 @@ temperature <- ggplot(NTL_LTER_processed,
        aes(x=factor(month, 
                     levels = 1:12, 
                     labels = month.abb), 
-           y = temperature_C, color = lakename)) +
+           y = temperature_C, 
+           color = lakename)) +
   geom_boxplot()+
-  scale_x_discrete(name = "month", drop = FALSE) +
+  scale_x_discrete(name = "Month", drop = FALSE) +
   labs(y = "Temperature in C", 
        color = "Lake")
 print(temperature)
@@ -134,11 +140,19 @@ TN <- ggplot(NTL_LTER_processed,
   geom_boxplot() +
   scale_x_discrete(name = "Month", drop = FALSE) +
   labs(y = "Total Nitrogen", 
-       color = "Lake")
+       color = "Lake")+
+  theme(legend.position = "bottom")
 print(TN)
   
 #create a cowplot of all three graphs
-plot_grid(temperature, TP, TN, nrow = 3, align = 'h', rel_heights = c(1.25, 1))
+plot_grid(temperature +
+            theme(legend.position = "none"), 
+          TP +
+            theme(legend.position = "none"), 
+          TN, 
+          nrow = 3, 
+          align = 'h', 
+          rel_heights = c(1, 1, 1.35))
 
 ```
 
@@ -158,8 +172,6 @@ ggplot(filter(Niwot_Ridge_processed,
            color = nlcdClass)) +
   geom_point()
 
-FIX LEGEND AND LABELS
-
 #7 Plot with NLCD classes separated into 3 facets 
 ggplot(filter(Niwot_Ridge_processed, 
               functionalGroup == "Needles"), 
@@ -167,7 +179,6 @@ ggplot(filter(Niwot_Ridge_processed,
            color = nlcdClass)) +
   geom_point() +
   facet_wrap(vars(nlcdClass))
-
 ```
 Question: Which of these plots (6 vs. 7) do you think is more effective, and why? 
 
