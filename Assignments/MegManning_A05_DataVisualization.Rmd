@@ -86,15 +86,12 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 
 ```{r plot total P vs PO4}
 #4 Total phosphorus (tp_ug) by phosphate (po4) --> RUNNING INTO ISSUES WITH NAS?
-ggplot(filter(NTL_LTER_processed, 
-              lakename == "Peter Lake" | lakename == "Paul Lake"),
-       aes(x = "po4", 
-           y = "tp_ug")) +
+ggplot(NTL_LTER_processed, aes(x = "po4", 
+           y = "tp_ug", color = lakename)) +
   geom_point() +
-  facet_wrap(vars(lakename))
-
-+
-  xlim()
+  geom_smooth(method = lm, color = "black") +
+  xlim()+
+  ylim()
 
 ```
 
@@ -107,20 +104,41 @@ Tip:
 
 ```{r Create boxplots}
 #5 3 separate boxplots of temperature, TP, and TN
-ggplot(NTL_LTER_processed, 
-       aes(x = month, y = temperature, color = lakename)) +
-  geom_boxplot()
+temperature <- ggplot(NTL_LTER_processed, 
+       aes(x=factor(month, 
+                    levels = 1:12, 
+                    labels = month.abb), 
+           y = temperature_C, color = lakename)) +
+  geom_boxplot()+
+  scale_x_discrete(name = "month", drop = FALSE) +
+  labs(y = "Temperature in C", 
+       color = "Lake")
+print(temperature)
 
-ggplot(NTL_LTER_processed, 
-       aes(x = month, y = tp_ug, color = lakename)) +
-  geom_boxplot()
+TP <- ggplot(NTL_LTER_processed, 
+       aes(x=factor(month, 
+                    levels = 1:12, 
+                    labels = month.abb), 
+           y = tp_ug, color = lakename)) +
+  geom_boxplot() +
+  scale_x_discrete(name = "Month", drop = FALSE) +
+  labs(y = "Total Phosphorus", 
+       color = "Lake")
+print(TP)
 
-ggplot(NTL_LTER_processed, 
-       aes(x = month, y = tn_ug, color = lakename))+
-  geom_boxplot()
+TN <- ggplot(NTL_LTER_processed, 
+       aes(factor(month, 
+                    levels = 1:12, 
+                    labels = month.abb), 
+           y = tn_ug, color = lakename))+
+  geom_boxplot() +
+  scale_x_discrete(name = "Month", drop = FALSE) +
+  labs(y = "Total Nitrogen", 
+       color = "Lake")
+print(TN)
   
 #create a cowplot of all three graphs
-
+plot_grid(temperature, TP, TN, nrow = 3, align = 'h', rel_heights = c(1.25, 1))
 
 ```
 
@@ -140,6 +158,7 @@ ggplot(filter(Niwot_Ridge_processed,
            color = nlcdClass)) +
   geom_point()
 
+FIX LEGEND AND LABELS
 
 #7 Plot with NLCD classes separated into 3 facets 
 ggplot(filter(Niwot_Ridge_processed, 
