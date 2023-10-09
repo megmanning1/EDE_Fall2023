@@ -7,6 +7,7 @@ geometry: margin=2.54cm
 editor_options: 
   chunk_output_type: console
 ---
+\listoffigures
 
 ## Objectives
 1. Perform simple data visualizations in the R package `ggplot`
@@ -79,7 +80,9 @@ Here are some commonly used aesthetic types that can be manipulated in ggplot:
 
 ### Plotting continuous variables over time: Scatterplot and Line Plot
 
-```{r, fig.height = 3, fig.width = 4, warning = FALSE}
+Playing around with the r code chunk with fig.cap and changing the height
+
+```{r, fig.height = 3, fig.width = 4, warning = FALSE, fig.cap="Scatterplot"}
 # Scatterplot
 #adding the fig.height = 3, fig.width = 4, warning = FALSE at the beginning of r code chunk means it is applied to every plot in the chunk
 

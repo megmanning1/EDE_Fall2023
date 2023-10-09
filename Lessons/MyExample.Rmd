@@ -1,0 +1,105 @@
+---
+title: "My example document"
+subtitle: "My subtitle here"
+author: "Meg Manning"
+date: "2023-10-05"
+output: pdf_document
+toc: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+\listoffigures
+
+List of figures will add "toc" for figures \newpage (this adds a page
+break - control over grouping)
+
+\listoftables
+
+(also helpful to list the tables you've made)
+
+> block quote goes here
+
+1.  Step 1
+2.  Step 2
+3.  Step 3
+
+-   this gets changed to a bullet
+-   second bullet
+
+## Heading
+
+### Subheading
+
+Try these things out on your own by trial and error... Go to the
+rmarkdown quick reference Use the cheat sheet - rmarkdown Help \>
+CheatSheet \> Reference guide
+
+## Tables
+
+### Creating tables
+
+| First Header | Second Header |
+|--------------|---------------|
+| Content Cell | Content Cell  |
+| Content Cell | Content Cell  |
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = TRUE,
+	warning = TRUE
+)
+```
+
+## R Markdown
+
+### sub-header
+
+#### another smallers sub header
+
+This is an R Markdown document. Markdown is a simple formatting syntax
+for authoring HTML, PDF, and MS Word documents. For more details on
+using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that
+includes both content as well as the output of any embedded R code
+chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to
+prevent printing of the R code that generated the plot.
+
+```{r Demo Chunk, echo=FALSE}
+x = 1 
+y = 13
+print(x+y)
+```
+
+## Inserting Links & Images
+
+[my link](URL)
+
+![my image](path%20to%20image) for example: (img/rmarkdownflow.png) --
+with img being an image folder
+
+OR
+
+![my image](URL) - this won't work to knit into pdf, but it will work to
+knit to html
+
+## Visual Editor
+
+Hit the visual button next to source
