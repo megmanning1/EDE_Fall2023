@@ -140,4 +140,4 @@ Add a table of contents to your document and knit to a PDF. Submit your PDF to S
 
 ## Git Repository
 
-[My Git repository]()
+[My Git repository](https://github.com/megmanning1/EDE_Fall2023/blob/main/Assignments/MegManning_A06_CraftingReports.pdf)
