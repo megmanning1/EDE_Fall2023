@@ -36,7 +36,7 @@ theme_set(mytheme)
 ### One-way ANOVA
 A one-way ANOVA is used when you have one categorical explanatory variable with more than two categories. In R, we can run the model with the function `lm` or `aov`, the latter of which will allow us to run post-hoc tests to determine pairwise differences.
 
-For example: Does total litter biomass differ among sites at the Niwot Ridge LTER?
+**For example: Does total litter biomass differ among sites at the Niwot Ridge LTER?**
 ```{r}
 # Wrangle the data
 Litter.Totals <- Litter %>%
@@ -47,10 +47,11 @@ summary(Litter.Totals)
 #check all value of plotID
 summary(Litter.Totals$plotID)
 
-# Test for normality. 
+# Test for normality. -- check our assumptions (normal distribution is 1st)
 # Note: the important assumption for GLMs is normality of residuals, 
 # not necessarily normality of raw data. See below when we plot the model.
 # shapiro.test() performs the Shapiro-Wilk test of the null that data follows a normal distribution
+#p-value is less than 0.05 - reject the null (meaning data is not normally distributed), except for 2 (057, 046) - because if p is greater than 0.05 means that they have normal distribution 
 
 shapiro.test(Litter.Totals$dryMass[Litter.Totals$plotID == "NIWO_040"])
 shapiro.test(Litter.Totals$dryMass[Litter.Totals$plotID == "NIWO_041"])
@@ -66,10 +67,10 @@ shapiro.test(Litter.Totals$dryMass[Litter.Totals$plotID == "NIWO_064"])
 shapiro.test(Litter.Totals$dryMass[Litter.Totals$plotID == "NIWO_067"])
 
 #results: reject null in all except two: NIWO_057 and NIWO_046
-#but method is robust from small deviations from normal distribution
+#but method is robust from small deviations from normal distribution: Q-Q plot shows that data is not normally distributed  
 qqnorm(Litter.Totals$dryMass); qqline(Litter.Totals$dryMass)
 
-# Test for equal variance
+# Test for equal variance (2nd assumption)
 # ANOVA is robust against departures from equal variance.
 # bartlett.test() performs Bartlett's test of the null that the variances in each of the groups (samples) are the same.
 bartlett.test(Litter.Totals$dryMass ~ Litter.Totals$plotID)
@@ -77,12 +78,14 @@ bartlett.test(Litter.Totals$dryMass ~ Litter.Totals$plotID)
 #results: reject null i.e. variances are not equal
 
 # Format ANOVA as aov
+#assign obj and call function aov() - similar to lm(), specify dataset and which is continuous variable and which is categorical variable 
 Litter.Totals.anova <- aov(data = Litter.Totals, dryMass ~ plotID)
 summary(Litter.Totals.anova)
 
 #results: reject null hypothesis i.e. difference between a pair of group means is statistically significant
+  #null -- means are the same across the populations; rejecting this but we don't know which means are different from each other (or which pair of differences is significant across means --> post-hoc test can help with this!)
 
-# Format ANOVA as lm
+# Format ANOVA as lm - main difference between these two functions is outputs (lm will have row for each plotID) 
 Litter.Totals.anova2 <- lm(data = Litter.Totals, dryMass ~ plotID)
 summary(Litter.Totals.anova2)
 
@@ -94,11 +97,18 @@ plot(Litter.Totals.anova2)
 # TukeyHSD() computes Tukey Honest Significant Differences
 TukeyHSD(Litter.Totals.anova)
 
+#diff (difference between means of two sites)
+#lwr, upr (lower, upper limits)
+#pairwise comparison 
+
 # Extract groupings for pairwise relationships
+#call HSD.test(anova object, our variable, group = TRUE -- group by groups with same mean)
+#classifying data for you 
 Litter.Totals.groups <- HSD.test(Litter.Totals.anova, "plotID", group = TRUE)
 Litter.Totals.groups
 
-# Graph the results
+# Graph the results - generate a plot where x-axis is site info, y-axis is drymass, as boxplot for each siteID, add treatment groups 
+#can see differences in means 
 Litter.Totals.plot <- ggplot(Litter.Totals, aes(x = plotID, y = dryMass)) +
   geom_boxplot() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -112,36 +122,39 @@ print(Litter.Totals.plot)
 
 What information does the output give us? How might we report this information in a report?
 
-> 
+> We would need to reorder the sites, have the same order as the list is showing from the HSD test. This would make the data better represented. 
 
-## TWO-WAY ANOVA
+## TWO-WAY ANOVA (examine two categorical variables)
 
 ### Main effects
-A two-way ANOVA allows us to examine the effects of two categorical explanatory variables on a continuous response variable. 
+A two-way ANOVA allows us to examine the effects of **two categorical explanatory variables on a continuous response variable.** 
 
 For example: What if we wanted to know how litter masses varied across functional groups and land cover class?
 ```{r}
 # Format as aov
 Litter.anova.2way <- aov(data = Litter, dryMass ~ functionalGroup + nlcdClass)
 summary(Litter.anova.2way)
+summary(Litter$nlcdClass)
+summary(Litter$functionalGroup)
 
-# Format as lm
+# Format as lm - intercept is with respect to one of levels
 Litter.anova.2way2 <- lm(data = Litter, dryMass ~ functionalGroup + nlcdClass)
 summary(Litter.anova.2way2)
 
-# Run a post-hoc test for pairwise differences
+# Run a post-hoc test for pairwise differences - all possible combos between groups, means, and confidence intervals (you will be able to extract more info than ANOVA)
 TukeyHSD(Litter.anova.2way)
 
 ```
 
 ### Interaction effects
 
-We may expect the effects of functional group and land cover to be dependent on each other. For instance, we may expect needle biomass to be larger in evergreen forests than in other land types. In this case, we might choose to run an interaction effects two-way ANOVA, which will examine the individual effects of the explanatory variables as well as the interaction of the explanatory variables.
+We may expect the effects of functional group and land cover to be dependent on each other. For instance, we may expect needle biomass to be larger in evergreen forests than in other land types. In this case, we might choose to run an **interaction effects two-way ANOVA**, which will examine the individual effects of the explanatory variables as well as the interaction of the explanatory variables.
 
-The output gives test statistics for each explanatory variable as well as the interaction effect of the explanatory variables. If the p-value for the interaction effect is less than 0.05, then we would consider the interaction among the explanatory variables to be significant.
+The output gives test statistics for each explanatory variable as well as the interaction effect of the explanatory variables. **If the p-value for the interaction effect is less than 0.05, then we would consider the interaction among the explanatory variables to be significant.**
 
 ```{r}
 # Format as aov
+#instead of dryMass as a function of group and class, it is based on interactions?
 Litter.anova.2way3 <- aov(data = Litter, dryMass ~ functionalGroup * nlcdClass)
 summary(Litter.anova.2way3)
 
@@ -161,10 +174,12 @@ Litter.interaction <- with(Litter, interaction(functionalGroup, nlcdClass))
 
 #Litter.test <- cbind(Litter,Litter.interaction)
 
+#compair means of each litter interactions for 25 levels found from Tukey
 Litter.anova.2way5 <- aov(data = Litter, dryMass ~ Litter.interaction)
 
 Litter.groups <- HSD.test(Litter.anova.2way5, "Litter.interaction", group = TRUE)
 Litter.groups
+#grouped dataset based on interactions 
 
 # Plot the results
 # Edit this graph to make it more visually appealing.
@@ -173,5 +188,6 @@ Litter.anova.plot <- ggplot(Litter, aes(y = dryMass, x = nlcdClass, color = func
   geom_boxplot()
 print(Litter.anova.plot)
 
+#make graph look pretty with labels 
 ```
 
