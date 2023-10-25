@@ -142,6 +142,13 @@ EPAair.subset <-
   select(mean_Lat:Ozone) %>%
   na.omit()
 
+#from A07
+
+#NTL_LTER.july <- NTL_LTER %>%
+  #filter(daynum >= 182 & daynum <= 212) %>%
+  #select(lakename:temperature_C) %>%
+  #drop_na()
+
 EPAairCorr <- cor(EAPair.subset)
 corrplot(EPAairCorr, method = "ellipse")
 corrplot.mixed(EPAairCorr, upper = "ellipse")

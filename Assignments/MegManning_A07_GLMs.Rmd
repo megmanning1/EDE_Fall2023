@@ -53,8 +53,8 @@ Our first research question is: Does mean lake temperature recorded during July 
 
 3. State the null and alternative hypotheses for this question:
 > Answer:
-H0: Temperature does not change with depth across all lakes
-Ha: Temperature does changes with depth across all lakes
+H0: Mean temperature does not change with depth across all lakes
+Ha: Mean temperature does changes with depth across all lakes
 
 
 4.  Wrangle your NTL-LTER dataset with a pipe function so that the records meet the following criteria: 
@@ -127,11 +127,12 @@ step(Tempbyall.regression)
 tempbest.regression <- lm(data= NTL_LTER.July, 
                            temperature_C ~ depth + year4 + daynum)
 summary(tempbest.regression)
+step(tempbest.regression)
 ```
 
 11. What is the final set of explanatory variables that the AIC method suggests we use to predict temperature in our multiple regression? How much of the observed variance does this model explain? Is this an improvement over the model using only depth as the explanatory variable?
 
-> Answer: 
+> Answer: Can't take away any of them...
 
 
 
@@ -142,30 +143,40 @@ summary(tempbest.regression)
 
 ```{r anova.model}
 #12 mean temps of different lakes for July - ANOVA
-NTL.anova <- aov(data = NTL_LTER.july, temperature_C ~ lakename)
+NTL.anova <- aov(data = NTL_LTER.July, temperature_C ~ lakename)
 summary(NTL.anova)
 ```
 
 13. Is there a significant difference in mean temperature among the lakes? Report your findings. 
 
-> Answer: 
+> Answer: Based on the fact that the p-value is less than 0.05, we can reject the null hypothesis that the mean teamperature is the same across all lakes, and we can state that the mean temperature if different for each lake.
 
 
 
 14. Create a graph that depicts temperature by depth, with a separate color for each lake. Add a geom_smooth (method = "lm", se = FALSE) for each lake. Make your points 50 % transparent. Adjust your y axis limits to go from 0 to 35 degrees. Clean up your graph to make it pretty. 
 
 ```{r scatterplot.2}
-#14.
-
+#14. graph of temp (y) by depth (x) colorized by lakename
+tempbydepth.plot2 <- ggplot(NTL_LTER.July,
+                            aes(x = depth,
+                                y = temperature_C,
+                                color = lakename)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm",
+              se = FALSE) +
+  labs(title = "Temperature by Depth",
+       color = "Lake Name",
+       x = "Depth (meters)",
+       y = "Temperature °C")
+print(tempbydepth.plot2)
 
 ```
 
 15. Use the Tukey's HSD test to determine which lakes have different means.
 
 ```{r tukey.test}
-#15
-
-
+#15 Run Tukey HSD on 
+TukeyHSD(NTL.anova)
 ```
 
 16.From the findings above, which lakes have the same mean temperature, statistically speaking, as Peter Lake? Does any lake have a mean temperature that is statistically distinct from all the other lakes?
@@ -183,6 +194,13 @@ summary(NTL.anova)
 18. Wrangle the July data to include only records for Crampton Lake and Ward Lake. Run the two-sample T-test on these data to determine whether their July temperature are same or different. What does the test say? Are the mean temperatures for the lakes equal? Does that match you answer for part 16?
 
 ```{r t.test}
+#Wrangle data for Crampton Lake and Ward Lake
+NTL.CramptonWard <- filter(NTL_LTER.July,
+                           lakename == "Crampton Lake" | lakename == "Ward Lake")
+
+#Two-sample t-test
+NTL.twosample <- t.test(NTL.CramptonWard$lakename ~ NTL.CramptonWard$temperature_C)
+NTL.twosample
 
 ```
 
