@@ -214,6 +214,7 @@ temp_data_trend1 <- Kendall::SeasonalMannKendall(temp_ts)
 temp_data_trend1
 summary(temp_data_trend1)
 
+#CHECK SLACK ANSWERS
 rain_data_plot <-
 ggplot(rain_decomp_complete, aes(x = Date, y = Observed)) +
   geom_point() +
