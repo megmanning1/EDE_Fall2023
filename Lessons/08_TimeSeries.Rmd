@@ -75,13 +75,23 @@ Time series datasets come with several caveats, which need to be addressed in or
 -   **Heteroscedasticity**: The variance of the time series is not constant over time
 -   **Covariance**: the covariance of the time series is not constant over time
 
+**General Flow: 4 Components of TS** *(see decomposing a time series)*
+
+-   **Trend**
+
+-   **Seasonality** - maybe there's a difference between summer and winter, whenever it's associated with calendar events = seasonal
+
+-   **Cycle** - can have up and down movements, not going to repeated every day/year, will be longer - not related to calendar events (usually represented with the trend and modeled together)
+
+-   **Random** - we cannot model the random component of time series; think about the "noise" with the model (plot should be random, there shouldn't be a trend - mean should be close to zero)
+
 ## Handling data gaps and missing data. Example: Eno River Discharge
 
 River discharge is measured daily at the Eno River gage station. Since we are working with one location measured over time, this will make a great example dataset for time series analysis.
 
 Let's look at what the dataset contains for mean daily discharge.
 
-**1) First thing to do in TMA -- plot data** 
+**1) First thing to do in TMA -- plot data**
 
 ```{r}
 ggplot(EnoDischarge, aes(x = datetime, y = discharge.mean)) +
@@ -91,7 +101,7 @@ ggplot(EnoDischarge, aes(x = datetime, y = discharge.mean)) +
 
 Notice there are missing data from 1971 to 1985. Gaps this large are generally an issue for time series analysis, as we don't have a continuous record of data or a good way to characterize any variability that happened over those years. We will illustrate a few workarounds to address these issues.
 
-Let's start by **removing the NAs and splitting the dataset into the early and late years.**
+2) Let's start by **removing the NAs and splitting the dataset into the early and late years.**
 
 ```{r}
 EnoDischarge.complete <- EnoDischarge %>%
@@ -260,7 +270,7 @@ print(wind_data_plot)
 
 What would we conclude based on these findings?
 
-> Answer: Based on the statistical tests, we can conclude that these data are seasonal - ran the mann-kendall with low p-value meaning we reject the null, therefore there is a trend, and then using the smk.test, the overall trend is decreasing (- slope)  
+> Answer: Based on the statistical tests, we can conclude that these data are seasonal - ran the mann-kendall with low p-value meaning we reject the null, therefore there is a trend, and then using the smk.test, the overall trend is decreasing (- slope)
 
 ## Forecasting with Autoregressive and Moving Average Models (ARMA)
 
