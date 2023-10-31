@@ -93,6 +93,11 @@ sum(is.na(Temp_BR_processed$Date))
 summary(Rainfall_BR_processed$Date)
 sum(is.na(Rainfall_BR_processed$Date))
 
+#Lab Answers
+summary(BR_complete$Rainfall)
+summary(BR_complete$Temperature_C)
+#no NAs
+
 
 #Exercise 6: Plot both series over time on separate plots. Add a trend line using geom_smooth(). Can you say something about the trend just by visualizing the data?
 

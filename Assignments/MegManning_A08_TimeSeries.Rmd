@@ -118,11 +118,19 @@ GaringerOzone <- left_join(Days, GaringerOzone_processed)
 7. Create a line plot depicting ozone concentrations over time. In this case, we will plot actual concentrations in ppm, not AQI values. Format your axes accordingly. Add a smoothed line showing any linear trend of your data. Does your plot suggest a trend in ozone concentration over time?
 
 ```{r}
-#7
-
+#7 Create line plot of ozone concentrations over time
+ozonebytime <- ggplot(GaringerOzone,
+                            aes(x = Date,
+                                y = Daily.Max.8.hour.Ozone.Concentration)) +
+  geom_line() +
+  geom_smooth(method = "lm",
+              col = "blue") +
+  labs(x = "Time",
+       y = "Ozone Concentrations (PPM)")
+print(ozonebytime)
 ```
 
->Answer:
+>Answer: Based on this plot, it looks like there may be a slightly negative trend as seen by the blue linear regression with a slight negative slope. However, since it's hard to tell if this is a trend of the data, we will need to run a few statistical tests. 
 
 ## Time Series Analysis
 
@@ -131,17 +139,27 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 8. Use a linear interpolation to fill in missing daily data for ozone concentration. Why didn't we use a piecewise constant or spline interpolation?
 
 ```{r}
-#8
-
+#8 Linear Interpolation to fill NAs for Ozone Concentration
+GaringerOzone_clean <- GaringerOzone %>% 
+  mutate(Daily.Max.8.hour.Ozone.Concentration = 
+           zoo::na.approx(Daily.Max.8.hour.Ozone.Concentration))
 ```
 
-> Answer: 
+> Answer: We used a linear interpolation because this method is similar to a "connect the dots" approach. Any missing data are assumed to fall between the previous and next measurement, with a straight line drawn between the known points determining the values of the interpolated data on any given date. We used this because we have small gaps within the data through time, if there were obvious gaps at the beginning or end, or a large enough gap in the middle, we would've had to split the data into different dataframes. This method allows us to interpolate the few missing values and still see ozone concentrations over time. 
 
 
 9. Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
 
 ```{r}
-#9
+#9 Create new data frame for monthly mean ozone concentrations
+
+GaringerOzone.monthly <- GaringerOzone_clean %>%
+  group_by(Year = year(Date), Month = month(Date)) %>% 
+  summarise(MonthlyOzone = mean(Daily.Max.8.hour.Ozone.Concentration))
+
+#Create new Date column with each month-year combo set as first of month
+##THIS IS WHERE I LEFT OFF...
+GaringerOzone.monthly <- mutate(GaringerOzone.monthly, month = month(Date)) 
 
 ```
 
