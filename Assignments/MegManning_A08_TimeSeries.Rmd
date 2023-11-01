@@ -10,21 +10,23 @@ editor_options:
 
 ## OVERVIEW
 
-This exercise accompanies the lessons in Environmental Data Analytics on generalized linear models. 
+This exercise accompanies the lessons in Environmental Data Analytics on generalized linear models.
 
 ## Directions
-1. Rename this file `<FirstLast>_A08_TimeSeries.Rmd` (replacing `<FirstLast>` with your first and last name).
-2. Change "Student Name" on line 3 (above) with your name.
-3. Work through the steps, **creating code and output** that fulfill each instruction.
-4. Be sure to **answer the questions** in this assignment document.
-5. When you have completed the assignment, **Knit** the text and code into a single PDF file.
 
-## Set up 
-1. Set up your session:
+1.  Rename this file `<FirstLast>_A08_TimeSeries.Rmd` (replacing `<FirstLast>` with your first and last name).
+2.  Change "Student Name" on line 3 (above) with your name.
+3.  Work through the steps, **creating code and output** that fulfill each instruction.
+4.  Be sure to **answer the questions** in this assignment document.
+5.  When you have completed the assignment, **Knit** the text and code into a single PDF file.
 
-* Check your working directory
-* Load the tidyverse, lubridate, zoo, and trend packages
-* Set your ggplot theme
+## Set up
+
+1.  Set up your session:
+
+-   Check your working directory
+-   Load the tidyverse, lubridate, zoo, and trend packages
+-   Set your ggplot theme
 
 ```{r, Set Up}
 # Set up session
@@ -42,8 +44,7 @@ mytheme <- theme_classic(base_size = 14) +
 theme_set(mytheme)
 ```
 
-
-2. Import the ten datasets from the Ozone_TimeSeries folder in the Raw data folder. These contain ozone concentrations at Garinger High School in North Carolina from 2010-2019 (the EPA air database only allows downloads for one year at a time). Import these either individually or in bulk and then combine them into a single dataframe named `GaringerOzone` of 3589 observation and 20 variables. 
+2.  Import the ten datasets from the Ozone_TimeSeries folder in the Raw data folder. These contain ozone concentrations at Garinger High School in North Carolina from 2010-2019 (the EPA air database only allows downloads for one year at a time). Import these either individually or in bulk and then combine them into a single dataframe named `GaringerOzone` of 3589 observation and 20 variables.
 
 ```{r, message = FALSE}
 #1 Import 10 datasets
@@ -83,13 +84,13 @@ GaringerOzone <- rbind(EPAair_2010,
 
 ## Wrangle
 
-3. Set your date column as a date class.
+3.  Set your date column as a date class.
 
-4. Wrangle your dataset so that it only contains the columns Date, Daily.Max.8.hour.Ozone.Concentration, and DAILY_AQI_VALUE. 
+4.  Wrangle your dataset so that it only contains the columns Date, Daily.Max.8.hour.Ozone.Concentration, and DAILY_AQI_VALUE.
 
-5. Notice there are a few days in each year that are missing ozone concentrations. We want to generate a daily dataset, so we will need to fill in any missing days with NA. Create a new data frame that contains a sequence of dates from 2010-01-01 to 2019-12-31 (hint: `as.data.frame(seq())`). Call this new data frame Days. Rename the column name in Days to "Date".
+5.  Notice there are a few days in each year that are missing ozone concentrations. We want to generate a daily dataset, so we will need to fill in any missing days with NA. Create a new data frame that contains a sequence of dates from 2010-01-01 to 2019-12-31 (hint: `as.data.frame(seq())`). Call this new data frame Days. Rename the column name in Days to "Date".
 
-6. Use a `left_join` to combine the data frames. Specify the correct order of data frames within this function so that the final dimensions are 3652 rows and 3 columns. Call your combined data frame GaringerOzone. 
+6.  Use a `left_join` to combine the data frames. Specify the correct order of data frames within this function so that the final dimensions are 3652 rows and 3 columns. Call your combined data frame GaringerOzone.
 
 ```{r}
 # 3 Fix Date
@@ -115,7 +116,7 @@ GaringerOzone <- left_join(Days, GaringerOzone_processed)
 
 ## Visualize
 
-7. Create a line plot depicting ozone concentrations over time. In this case, we will plot actual concentrations in ppm, not AQI values. Format your axes accordingly. Add a smoothed line showing any linear trend of your data. Does your plot suggest a trend in ozone concentration over time?
+7.  Create a line plot depicting ozone concentrations over time. In this case, we will plot actual concentrations in ppm, not AQI values. Format your axes accordingly. Add a smoothed line showing any linear trend of your data. Does your plot suggest a trend in ozone concentration over time?
 
 ```{r}
 #7 Create line plot of ozone concentrations over time
@@ -130,13 +131,13 @@ ozonebytime <- ggplot(GaringerOzone,
 print(ozonebytime)
 ```
 
->Answer: Based on this plot, it looks like there may be a slightly negative trend as seen by the blue linear regression with a slight negative slope. However, since it's hard to tell if this is a trend of the data, we will need to run a few statistical tests. 
+> Answer: Based on this plot, it looks like there may be a slightly negative trend as seen by the blue linear regression with a slight negative slope. However, since it's hard to tell if this is a trend of the data, we will need to run a few statistical tests.
 
 ## Time Series Analysis
 
-Study question: Have ozone concentrations changed over the 2010s at this station? 
+Study question: Have ozone concentrations changed over the 2010s at this station?
 
-8. Use a linear interpolation to fill in missing daily data for ozone concentration. Why didn't we use a piecewise constant or spline interpolation?
+8.  Use a linear interpolation to fill in missing daily data for ozone concentration. Why didn't we use a piecewise constant or spline interpolation?
 
 ```{r}
 #8 Linear Interpolation to fill NAs for Ozone Concentration
@@ -147,10 +148,9 @@ GaringerOzone_clean <- GaringerOzone %>%
 summary(GaringerOzone_clean$Daily.Max.8.hour.Ozone.Concentration)
 ```
 
-> Answer: We used a linear interpolation because this method is similar to a "connect the dots" approach. Any missing data are assumed to fall between the previous and next measurement, with a straight line drawn between the known points determining the values of the interpolated data on any given date. We used this because we have small gaps within the data through time, if there were obvious gaps at the beginning or end, or a large enough gap in the middle, we would've had to split the data into different dataframes. This method allows us to interpolate the few missing values and still see ozone concentrations over time. 
+> Answer: We used a linear interpolation because this method is similar to a "connect the dots" approach. Any missing data are assumed to fall between the previous and next measurement, with a straight line drawn between the known points determining the values of the interpolated data on any given date. We used this because we have small gaps within the data through time, if there were obvious gaps at the beginning or end, or a large enough gap in the middle, we would've had to split the data into different dataframes. This method allows us to interpolate the few missing values and still see ozone concentrations over time.
 
-
-9. Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
+9.  Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
 
 ```{r}
 #9 Create new data frame for monthly mean ozone concentrations
@@ -162,7 +162,6 @@ GaringerOzone.monthly <- GaringerOzone_clean %>%
 GaringerOzone.monthly <- GaringerOzone.monthly %>%
   mutate(Date = make_date(Year, Month, 1)) 
 ```
-
 
 10. Generate two time series objects. Name the first `GaringerOzone.daily.ts` and base it on the dataframe of daily observations. Name the second `GaringerOzone.monthly.ts` and base it on the monthly average ozone values. Be sure that each specifies the correct start and end dates and the frequency of the time series.
 
@@ -178,7 +177,6 @@ GaringerOzone.monthly.ts <- ts(GaringerOzone.monthly$MonthlyOzone,
                    frequency=12)
 ```
 
-
 11. Decompose the daily and the monthly time series objects and plot the components using the `plot()` function.
 
 ```{r}
@@ -190,7 +188,6 @@ GaringerOzone.monthly.decomp <- stl(GaringerOzone.monthly.ts,s.window = "periodi
 plot(GaringerOzone.monthly.decomp)
 ```
 
-
 12. Run a monotonic trend analysis for the monthly Ozone series. In this case the seasonal Mann-Kendall is most appropriate; why is this?
 
 ```{r}
@@ -198,20 +195,26 @@ plot(GaringerOzone.monthly.decomp)
 GaringerOzone.monthly.trend <- Kendall::SeasonalMannKendall(GaringerOzone.monthly.ts)
 GaringerOzone.monthly.trend
 summary(GaringerOzone.monthly.trend)
+
+#Run SMK Test
+GaringerOzone.monthly.trend2 <- trend::smk.test(GaringerOzone.monthly.ts)
+# Inspect results
+GaringerOzone.monthly.trend2
+summary(GaringerOzone.monthly.trend2)
 ```
 
-> Answer: For this analysis we are interested in the concentration of ozone in ppm on average for each month. Since we want to assess whether our data, in this case the ozone concentration, increases or decreases over time and whether the trend in either direction is statistically significant, we used the Mann-Kendall test to figure out if a monotonic trend exists. 
+> Answer: For this analysis we are interested in the concentration of ozone in ppm on average for each month. Since we want to assess whether our data, in this case the ozone concentration, increases or decreases over time and whether the trend in either direction is statistically significant, we used the Mann-Kendall test to figure out if a monotonic trend exists.
 
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
 ```{r}
 # 13 Create plot of monthly ozone by time
-ozonebytime.monthly <- ggplot(GaringerOzone.monthly, aes(x = Date,
-                                                         y = MonthlyOzone)) +
+ozonebytime.monthly <- ggplot(GaringerOzone.monthly, 
+                              aes(x = Date,
+                                  y = MonthlyOzone)) +
   geom_point() +
   geom_line() +
-  geom_smooth(method = "lm",
-              col = "blue") +
+  geom_smooth(method = "lm") +
   labs(x = "Time",
        y = "Ozone Concentrations (PPM)",
        title = "Mean Monthly Ozone Concentrations over Time")
@@ -220,7 +223,7 @@ print(ozonebytime.monthly)
 
 14. To accompany your graph, summarize your results in context of the research question. Include output from the statistical test in parentheses at the end of your sentence. Feel free to use multiple sentences in your interpretation.
 
-> Answer: This graph is depicting the mean monlthy ozone between 2010 and 2019, using the Mann-Kendall test to see if there is a trend in the change in ozone concentrations over time by month. With a linear regression plotted on top of the graph, we can visually see what the trend of ozone concentration through time might look like. (Based on the statistical tests, we can conclude that these data are seasonal by running the mann-kendall resulting in a p-value less than 0.05, we reject the null, therefore there is a trend)
+> Answer: This graph is depicting the mean monthly ozone between 2010 and 2019, using the Mann-Kendall test to see if there is a trend in the change in ozone concentrations over time by month. With a linear regression plotted on top of the graph, we can visually see what the trend of ozone concentration through time might look like. (Based on the Mann-Kendall test, we can conclude that the trend is significant because our p-value is less than 0.05, and that the slope is negative, or ozone is decreasing over time, because of the tau statistic from the smk test)
 
 15. Subtract the seasonal component from the `GaringerOzone.monthly.ts`. Hint: Look at how we extracted the series components for the EnoDischarge on the lesson Rmd file.
 
@@ -230,21 +233,20 @@ print(ozonebytime.monthly)
 #15 Subtract seasonal component from the ts
 GaringerOzone_Components <- as.data.frame(GaringerOzone.monthly.decomp$time.series[,1:3])
 
-GaringerOzone.monthly.ts2 <- ts(GaringerOzone_Components$trend,
-                   start=c(f_year,f_month),
+GaringerOzone_noseasonal <- mutate(GaringerOzone_Components,
+        Observed = GaringerOzone.monthly$MonthlyOzone,     
+        Date = GaringerOzone.monthly$Date,
+        Observed_NoSeasonality = Observed - seasonal)
+
+GaringerOzone.monthly.ts2 <- ts(GaringerOzone_noseasonal$Observed_NoSeasonality,
+                   start= 2010,
                    frequency=12)
-
-#GaringerOzone_Components <- mutate(GaringerOzone.monthly,
-        #Observed = GaringerOzone.monthly$MonthlyOzone,     
-        #Date = GaringerOzone.monthly$Month)
-
-
 
 #16 Run Mann-Kendall on the new dataframe without the season component
 
-GaringerOzone.monthly.trend2 <- Kendall::SeasonalMannKendall(GaringerOzone.monthly.ts2)
-GaringerOzone.monthly.trend2
-summary(GaringerOzone.monthly.trend2)
+GaringerOzone.monthly.trend3 <- Kendall::MannKendall(GaringerOzone.monthly.ts2)
+GaringerOzone.monthly.trend3
+summary(GaringerOzone.monthly.trend3)
 ```
 
-> Answer: 
+> Answer: When removing the seasonal component of the ozone data and running the Mann-Kendall test, we can see that the slope has decreased to -0.165 based on the tau statistic. Our p-value is also less than 0.05 and is much smaller than when we included the seasonal component of the data. This means that the trend is in fact significant and it is a negative trend based on the negative slope.
