@@ -245,9 +245,6 @@ GaringerOzone.monthly.ts2 <- ts(GaringerOzone_Components$trend,
 GaringerOzone.monthly.trend2 <- Kendall::SeasonalMannKendall(GaringerOzone.monthly.ts2)
 GaringerOzone.monthly.trend2
 summary(GaringerOzone.monthly.trend2)
-
-
-
 ```
 
 > Answer: 
