@@ -194,39 +194,57 @@ plot(GaringerOzone.monthly.decomp)
 12. Run a monotonic trend analysis for the monthly Ozone series. In this case the seasonal Mann-Kendall is most appropriate; why is this?
 
 ```{r}
-#12
-
-
-
+#12 monotonic trend analysis using the Mann-Kendall
+GaringerOzone.monthly.trend <- Kendall::SeasonalMannKendall(GaringerOzone.monthly.ts)
+GaringerOzone.monthly.trend
+summary(GaringerOzone.monthly.trend)
 ```
 
-> Answer: 
+> Answer: For this analysis we are interested in the concentration of ozone in ppm on average for each month. Since we want to assess whether our data, in this case the ozone concentration, increases or decreases over time and whether the trend in either direction is statistically significant, we used the Mann-Kendall test to figure out if a monotonic trend exists. 
 
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
 ```{r}
-# 13
-
-
-
-
+# 13 Create plot of monthly ozone by time
+ozonebytime.monthly <- ggplot(GaringerOzone.monthly, aes(x = Date,
+                                                         y = MonthlyOzone)) +
+  geom_point() +
+  geom_line() +
+  geom_smooth(method = "lm",
+              col = "blue") +
+  labs(x = "Time",
+       y = "Ozone Concentrations (PPM)",
+       title = "Mean Monthly Ozone Concentrations over Time")
+print(ozonebytime.monthly)
 ```
 
 14. To accompany your graph, summarize your results in context of the research question. Include output from the statistical test in parentheses at the end of your sentence. Feel free to use multiple sentences in your interpretation.
 
-> Answer: 
+> Answer: This graph is depicting the mean monlthy ozone between 2010 and 2019, using the Mann-Kendall test to see if there is a trend in the change in ozone concentrations over time by month. With a linear regression plotted on top of the graph, we can visually see what the trend of ozone concentration through time might look like. (Based on the statistical tests, we can conclude that these data are seasonal by running the mann-kendall resulting in a p-value less than 0.05, we reject the null, therefore there is a trend)
 
 15. Subtract the seasonal component from the `GaringerOzone.monthly.ts`. Hint: Look at how we extracted the series components for the EnoDischarge on the lesson Rmd file.
 
 16. Run the Mann Kendall test on the non-seasonal Ozone monthly series. Compare the results with the ones obtained with the Seasonal Mann Kendall on the complete series.
 
 ```{r}
-#15
+#15 Subtract seasonal component from the ts
+GaringerOzone_Components <- as.data.frame(GaringerOzone.monthly.decomp$time.series[,1:3])
+
+GaringerOzone.monthly.ts2 <- ts(GaringerOzone_Components$trend,
+                   start=c(f_year,f_month),
+                   frequency=12)
+
+#GaringerOzone_Components <- mutate(GaringerOzone.monthly,
+        #Observed = GaringerOzone.monthly$MonthlyOzone,     
+        #Date = GaringerOzone.monthly$Month)
 
 
 
-#16
+#16 Run Mann-Kendall on the new dataframe without the season component
 
+GaringerOzone.monthly.trend2 <- Kendall::SeasonalMannKendall(GaringerOzone.monthly.ts2)
+GaringerOzone.monthly.trend2
+summary(GaringerOzone.monthly.trend2)
 
 
 
