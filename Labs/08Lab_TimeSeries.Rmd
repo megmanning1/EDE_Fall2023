@@ -135,7 +135,6 @@ rain_ts <- ts(BR_complete$Rainfall,
 temp_ts <- ts(BR_complete$Temperature_C,
                    start=c(f_year,f_month),
                    frequency=12)
-
 ```
 
 
