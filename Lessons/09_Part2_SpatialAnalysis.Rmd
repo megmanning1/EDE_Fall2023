@@ -316,7 +316,6 @@ mapView(state_sf)
 #List the unique values in the DWQ_Basin field
 unique(huc8_sf$DWQ_Basin)
 
-
 #Summarize on DWQ Basin value
 huc2_sf <- huc8_sf %>%
   group_by(DWQ_Basin) %>%
