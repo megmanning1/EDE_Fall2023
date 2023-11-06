@@ -45,6 +45,8 @@ library(tidyverse)
 library(lubridate)
 library(sf)
 library(mapview); mapviewOptions(fgb = FALSE)
+#install.packages("mapview")
+#install.packages("terra")
 library(RColorBrewer)
 library(here)
 
@@ -92,14 +94,13 @@ Below we read in the USA counties shapefile, filtering for just the NC features 
 counties_sf<- st_read(here('Data/Spatial/cb_2018_us_county_20m.shp')) %>% 
   filter(STATEFP == 37) #Filter for just NC Counties
 
-#
+#Column names
 colnames(counties_sf)
 
-#
+#coordinate system 
 st_crs(counties_sf) 
 
-
-#
+#number of rows 
 nrow(counties_sf)
 
 #Reveal the extent of this dataset via the st_bbox() function
@@ -118,22 +119,20 @@ mapView(counties_sf, zcol = "AWATER")
 
 ```{r read HUCs shapefile}
 #Read the shapefile into an sf dataframe named "huc8_sf"
-
+huc8_sf <- st_read("./Data/Spatial/NCHUC8.shp")
 
 #Reveal the columns
-
+colnames(huc8_sf)
 
 #Check the CRS
-
+st_crs(huc8_sf)
 
 #Examine some records
 head(huc8_sf)
 
 #View the data as a map, colored by the acreage in each
-
-
-
-
+mapView(huc8_sf, zcol = "ACRES")
+         
 ```
 
 ### 2.2.3 Challenge!
@@ -142,14 +141,33 @@ head(huc8_sf)
 
 ```{r Select the Upper Neuse HUC 8}
 #Read the shapefile into an sf dataframe
-
-
+huc8_sf_un <- st_read("./Data/Spatial/NCHUC8.shp") %>%
+  filter(SUBBASIN == "Upper Neuse")
 
 #Create a map
+mapView(huc8_sf_un, zcol = "SUBBASIN")
 
+#layer both on ggplot - add them to the *geoms* NOT within the ggplot()
+#color = is the outline of the shape
+#fill = is filling the whole shape 
+ggplot() +
+  geom_sf(data = huc8_sf,fill ='orange') + 
+  geom_sf(data = huc8_sf_un,fill='purple', shape = "SUBBASIN", color = "black") 
 
+#, shape = "SUBBASIN" is calling out the subbasin and color = is the outline 
 
+#layer both on in mapview
+#alpha may control transparency
+mapView(huc8_sf, col.regions = "orange") +
+  mapView(huc8_sf_un, col.regions = "purple")
 
+#change name of legend with layer.name = 
+mapView(huc8_sf, col.regions = "orange", layer.name = "HUC 8") +
+  mapView(huc8_sf_un, col.regions = "purple", layer.name = "Upper Neuse")
+
+#Option to use | instead of + --> creates a swiper view map instead of just layered
+mapView(huc8_sf, col.regions = "orange") |
+  mapView(huc8_sf_un, col.regions = "purple")
 ```
 
 ### 2.2.4 Reading in GeoJSON data
@@ -252,6 +270,8 @@ ggplot() +
 
 ```{r}
 #Compute HUC8 wind energy
+#colClasses --> used to treat things like HUC12 as factors and not strings
+#substr() is substring of characters and take everything from the 1st character to the 8th character
 wind_raw <- read.csv('https://raw.githubusercontent.com/ENV859/EnviroAtlasData/main/Wind_Energy.csv',
   colClasses = c('HUC_12' = 'factor')) %>%  
   mutate(HUC_8 = substr(HUC_12,1,8)) %>% 
@@ -287,21 +307,26 @@ state_sf <- counties_sf %>%
   summarize(ALAND = sum(ALAND))
 
 #View the data
-mapview(state_sf)
+mapView(state_sf)
 ```
 
 *Now you try*: Aggregate the HUC_8 data on the `DWQ_Basin` attribute, computing the sum of the `ACRES` and `SQ_MILES` field and view the result.
 
 ```{r Aggregate the HUC data on an attribute, saving as huc2_sf}
 #List the unique values in the DWQ_Basin field
-
+unique(huc8_sf$DWQ_Basin)
 
 
 #Summarize on DWQ Basin value
-
+huc2_sf <- huc8_sf %>%
+  group_by(DWQ_Basin) %>%
+  summarize(
+    ACRES = sum(ACRES),
+    SQ_MILES = sum(SQ_MILES)
+  )
 
 #Map the data
-
+mapView(huc2_sf)
 
 ```
 
@@ -381,11 +406,15 @@ mapview(neuse_counties_sf, zcol='Area_m2')
 
 ```{r EXERCISE: Clipping}
 #Select the Triangle County from the 
+tri_sf <- counties_sf_utm %>%
+  filter(NAME %in% c("Chatham", "Durham", "Orange", "Wake")) 
 
-
+#%in% allows you to make a vector of all the counties you want
   
 #Grab the intersecting HUC_8s
-
+tri_intersec <- 
+st_intersects() #a selection
+st_intersection() #takes two datasets and will give you intersection
 
 
 #Intersect the HUC_8s
