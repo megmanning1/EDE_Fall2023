@@ -1,7 +1,9 @@
 ---
-title: "Assignment 9: Spatial Analysis in R"
+title: 'Assignment 9: Spatial Analysis in R'
 author: "Meg Manning"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ## OVERVIEW
