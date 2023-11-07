@@ -53,14 +53,14 @@ counties_sf<- st_read(here("Data/Spatial/cb_2018_us_county_20m.shp")) %>%
 st_crs(counties_sf)
 st_crs(counties_sf)$epsg
 
-#5. Plot the data --> if using mapView then knit to html 
+#5. Plot the data
 ggplot(data=counties_sf) +
   geom_sf()
 ```
 
 6. What is the EPSG code of the Counties dataset? Is this a geographic or a projected coordinate reference system? (Or, does this CRS use angular or planar coordinate units?) To what datum is this CRS associated? (Tip: look for the EPSG code on <https://spatialreference.org> and examine the link for "Well Known Text as HTML" or "Human-Readable OGC WKT"...)
 
-> ANSWER: 4269. This corre
+> ANSWER: 4269 (NAD83). This is a geographic coordinate reference which uses the North America Datum from 1983. 
 > 
 
 
@@ -75,7 +75,8 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 ```{r Read in USGS Gage Locations}
 #7. Read in gage locations csv as a dataframe
 usgs_gage <- read.csv("./Data/Raw/NWIS_SiteInfo_NE_RAW.csv",
-                      colClasses = c("site_no" = "factor", "dec_coord_datum_cd" = "factor"))
+                      stringsAsFactors = TRUE,
+                      colClasses = c("site_no" = "factor"))
 
 #8. Reveal the names of the columns
 colnames(usgs_gage)
@@ -105,7 +106,7 @@ colnames(usgs_gage.sf)
 
 12. What new field(s) appear in the sf dataframe created? What field(s), if any, disappeared?
 
->ANSWER: There is now a geometry field...
+>ANSWER: The lat/long fields disappeared and the new field created is geometry.
 >
 
 
@@ -143,29 +144,20 @@ Lastly, we want to attach some gage height data to our site locations. I've cons
 ```{r Read in gage site data}
 #14. Read the site flow data into a data frame
 gage_height <- read.csv("./Data/Raw/NWIS_SiteFlowData_NE_RAW.csv",
+                        stringsAsFactors = TRUE,
                         colClasses = c("site_no" = "factor"))
- 
-# what should you do about date category? gage_height$date <- as.Date(gage_height$date, format = )
-
 
 #15. Show the column names
 colnames(gage_height)
 
 #16. Join the flow data to our NWIS gage location spatial dataframe
-gage_join <-  merge(x = usgs_gage.sf,
-                           y = gage_height, 
-                           by = "site_no")
-
 gage_sf_join <- usgs_gage.sf %>% 
-  left_join(gage_height, by = c("site_no")) %>%
-  drop_na()
+  inner_join(gage_height, by = c("site_no")) 
 
 #17. Show the column names of the joined dataset
-colnames(gage_join)
 colnames(gage_sf_join)
 
 #18. Show the dimensions of this joined dataset
-dim(gage_join)
 dim(gage_sf_join)
 
 ```
@@ -180,11 +172,11 @@ Now we can examine where the flooding appears most acute by visualizing gage hei
 #Map the points, sized by gage height
 ggplot() +
   geom_sf(data = counties_sf,fill ='beige') + 
-  geom_sf(data = gage_sf_join, mapping = aes(size = gage_ht))
-
-#why isn't my legend changing with this?
-  #labs(color = "Gage Height by meters")
-  #guides(color = guide_legend(title = "Gage Height by meters"))
+  geom_sf(data = gage_sf_join, mapping = aes(size = gage_ht), 
+                                                       color = 'blue') +
+            labs(title = "NWIS Gage Locations in Nebraska",
+                 subtitle = "Meg Manning",
+                 size = "Gage Height (m)")
 ```
 
 ---
@@ -202,12 +194,16 @@ Up next we will do some spatial analysis with our data. To prepare for this, we 
 ```{r spatial analysis}
 #20 Transform the counties and gage location datasets to UTM Zone 14
 gage_sf_utm <- st_transform(gage_sf_join, crs = 32614)
+counties_sf_utm <- st_transform(counties_sf, crs = 32614)
 
 #21 Plot the data
 #mapView(gage_sf_utm) - how do I show this with different colors? feel like I'm doing the same thing?
 ggplot() +
-  geom_sf(data = counties_sf, fill="beige") +
-  geom_sf(data = gage_sf_utm, aes(color = gage_ht))
+  geom_sf(data = counties_sf_utm, fill="beige") +
+  geom_sf(data = gage_sf_utm, aes(color = gage_ht)) +
+            labs(title = "NWIS Gage Locations in Nebraska",
+                 subtitle = "Meg Manning",
+                 color = "Gage Height (m)")
 
 ```
 
@@ -225,14 +221,18 @@ Now let's zoom into a particular county and examine the gages located there.
 
 ```{r spatial selection}
 #22 Select the county - HOW DO YOU FIND THE COUNTY?
-dawson_sf <- gage_sf_utm %>% 
-  filter(station_nm.x == "Dawson") 
+dawson_sf <- counties_sf_utm %>% 
+  filter(NAME == "Dawson") 
 
 #23 Spatially select gages within the selected county
-
+dawson_gages <- gage_sf_utm[dawson_sf,]
 
 #24 Plot
-
-
+ggplot() +
+  geom_sf(data = counties_sf_utm, fill="beige") +
+  geom_sf(data = dawson_sf, fill = "maroon") +
+  geom_sf(data = dawson_gages, color = "blue") +
+  labs(title = "NWIS Gage Locations in Nebraska with Dawson Gage Sites",
+       subtitle = "Meg Manning")
 
 ```
