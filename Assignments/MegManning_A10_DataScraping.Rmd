@@ -120,30 +120,61 @@ ggplot(df_watersupply,aes(x=Date,y=Max_Day_Use)) +
 
 ```{r construct.a.scraping.function}
 #6. Construct a function using code above for any PWSID
-the_base_url <- 'https://www.ncwater.org/WUDC/app/LWSP/search.php'
+
 PWSID <- 03-32-010
 the_year <- 2015
-the_scrape_url <- paste0(the_base_url, '/', PWSID, '/', the_year)
-print(the_scrape_url)
 
 scrape.it <- function(the_year, PWSID){
-  the_scrape_url <- paste0(the_base_url, '/', PWSID, '/', the_year)
   
-  water_system <- webpage %>% html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>% html_text()
-  PWSID <- webpage %>% html_nodes("td tr:nth-child(1) td:nth-child(5)") %>% html_text()
-  ownership <- webpage %>% html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>% html_text()
-  MGD_bymonth <- webpage %>% html_nodes("th~ td+ td") %>% html_text()
-
+  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/search.php', 
+                                  PSWID, '/', the_year))
+  
+  water_system_tag <- "div+ table tr:nth-child(1) td:nth-child(2)"
+  PWSID_tag <- "td tr:nth-child(1) td:nth-child(5)"
+  ownership_tag <- "div+ table tr:nth-child(2) td:nth-child(4)"
+  MGD_bymonth_tag <- "th~ td+ td"
+  
+  water_system <- the_website %>% html_nodes(water_system_tag) %>% html_text()
+  PWSID <- the_website %>% html_nodes(PWSID_tag) %>% html_text()
+  ownership <- the_website %>% html_nodes(ownership_tag) %>% html_text()
+  MGD_bymonth <- the_website %>% html_nodes(MGD_bymonth_tag) %>% html_text()
+  
   df_watersupply <- data.frame("Month" = rep(1:12),
-                             "Year" = rep(the_year,12),
-                             "Max_Day_Use" = as.numeric(MGD_bymonth)) %>%
+                               "Year" = rep(the_year,12),
+                               "Max_Day_Use" = as.numeric(MGD_bymonth)) %>%
     mutate(water_system = !!water_system,
-         PWSID = !!PWSID,
-         Ownership = !!ownership,
-         Date = my(paste(Month,"-",Year)))
-
+           PWSID = !!PWSID,
+           Ownership = !!ownership,
+           Date = my(paste(Month,"-",Year)))
+  
   return(df_watersupply)
-  }
+}
+
+#FIRST ATTEMPT
+#the_base_url <- 'https://www.ncwater.org/WUDC/app/LWSP/search.php'
+#PWSID <- 03-32-010
+#the_year <- 2015
+#the_scrape_url <- paste0(the_base_url, '/', PWSID, '/', the_year)
+#print(the_scrape_url)
+
+#scrape.it <- function(the_year, PWSID){
+  #the_scrape_url <- paste0(the_base_url, '/', PWSID, '/', the_year)
+  
+  #water_system <- webpage %>% html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>% html_text()
+  #PWSID <- webpage %>% html_nodes("td tr:nth-child(1) td:nth-child(5)") %>% html_text()
+  #ownership <- webpage %>% html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>% html_text()
+  #MGD_bymonth <- webpage %>% html_nodes("th~ td+ td") %>% html_text()
+
+  #df_watersupply <- data.frame("Month" = rep(1:12),
+                       #      "Year" = rep(the_year,12),
+                       #      "Max_Day_Use" = as.numeric(MGD_bymonth)) %>%
+   # mutate(water_system = !!water_system,
+   #      PWSID = !!PWSID,
+   #      Ownership = !!ownership,
+   #      Date = my(paste(Month,"-",Year)))
+
+  #return(df_watersupply)
+ # }
 
 ```
 
@@ -151,7 +182,7 @@ scrape.it <- function(the_year, PWSID){
 
 ```{r fetch.and.plot.Durham.2015.data}
 #7 Extract and plot max daily withdrawals for Durham 
-durham_df <- scrape.it(2015,'03-32-010')
+durham_df <- scrape.it(2015, "03-32-010")
 view(durham_df)
 
 #plot the max daily withdrawals for Durham
