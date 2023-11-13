@@ -27,6 +27,7 @@ This exercise accompanies the lessons in Environmental Data Analytics on data sc
 #1 
 library(tidyverse)
 library(rvest)
+library(lubridate)
 library(here); here()
 ```
 
@@ -121,13 +122,13 @@ ggplot(df_watersupply,aes(x=Date,y=Max_Day_Use)) +
 ```{r construct.a.scraping.function}
 #6. Construct a function using code above for any PWSID
 
-PWSID <- 03-32-010
+PWSID <- "03-32-010"
 the_year <- 2015
 
-scrape.it <- function(the_year, PWSID){
+scrape.it <- function(PWSID, the_year){
   
-  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/search.php', 
-                                  PSWID, '/', the_year))
+  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=', 
+                                  PWSID, "&year=", the_year))
   
   water_system_tag <- "div+ table tr:nth-child(1) td:nth-child(2)"
   PWSID_tag <- "td tr:nth-child(1) td:nth-child(5)"
@@ -149,40 +150,13 @@ scrape.it <- function(the_year, PWSID){
   
   return(df_watersupply)
 }
-
-#FIRST ATTEMPT
-#the_base_url <- 'https://www.ncwater.org/WUDC/app/LWSP/search.php'
-#PWSID <- 03-32-010
-#the_year <- 2015
-#the_scrape_url <- paste0(the_base_url, '/', PWSID, '/', the_year)
-#print(the_scrape_url)
-
-#scrape.it <- function(the_year, PWSID){
-  #the_scrape_url <- paste0(the_base_url, '/', PWSID, '/', the_year)
-  
-  #water_system <- webpage %>% html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>% html_text()
-  #PWSID <- webpage %>% html_nodes("td tr:nth-child(1) td:nth-child(5)") %>% html_text()
-  #ownership <- webpage %>% html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>% html_text()
-  #MGD_bymonth <- webpage %>% html_nodes("th~ td+ td") %>% html_text()
-
-  #df_watersupply <- data.frame("Month" = rep(1:12),
-                       #      "Year" = rep(the_year,12),
-                       #      "Max_Day_Use" = as.numeric(MGD_bymonth)) %>%
-   # mutate(water_system = !!water_system,
-   #      PWSID = !!PWSID,
-   #      Ownership = !!ownership,
-   #      Date = my(paste(Month,"-",Year)))
-
-  #return(df_watersupply)
- # }
-
 ```
 
 7. Use the function above to extract and plot max daily withdrawals for Durham (PWSID='03-32-010') for each month in 2015
 
 ```{r fetch.and.plot.Durham.2015.data}
 #7 Extract and plot max daily withdrawals for Durham 
-durham_df <- scrape.it(2015, "03-32-010")
+durham_df <- scrape.it("03-32-010", 2015)
 view(durham_df)
 
 #plot the max daily withdrawals for Durham
@@ -198,19 +172,12 @@ ggplot(durham_df,aes(x=Date,y=Max_Day_Use)) +
 8. Use the function above to extract data for Asheville (PWSID = 01-11-010) in 2015. Combine this data with the Durham data collected above and create a plot that compares Asheville's to Durham's water withdrawals.
 
 ```{r fetch.and.plot.Asheville.2015.data}
-#8 Extract data for Asheville in 2015 SOMETHING'S WRONG WITH FUNCTION (water system name isn't changing :/)
+#8 Extract data for Asheville in 2015
 the_year = 2015
 PWSID = '01-11-010'
 
-#Use lapply to apply the scrape function for each year in function - repeat scrape.it function for each year in the the_years you've loaded 
-asheville_df <- lapply(X = the_year,
-                  FUN = scrape.it,
-                  PWSID=PWSID)
-
-
-asheville_df <- scrape.it(2015,'01-11-010')
+asheville_df <- scrape.it('01-11-010', 2015)
 view(asheville_df)
-
 ```
 
 
@@ -219,8 +186,17 @@ view(asheville_df)
 > TIP: See Section 3.2 in the "10_Data_Scraping.Rmd" where we apply "map2()" to iteratively run a function over two inputs. Pipe the output of the map2() function to `bindrows()` to combine the dataframes into a single one. 
 
 ```{r fetch.and.plot.Asheville.multiyear.data }
-#9 
+#9 "Map" the "scrape.it" function to retrieve data for 2010 thru 2021
+#SOMETHING IS WRONG WITH MAP2 :(
+PWSID <- "01-11-010"
+the_years <- 2010:2021
 
+df_2010_2021 <- map2(the_years, PWSID, scrape.it) %>%
+  bind_rows()
+
+#Plot
+ggplot(df_2010_2021,aes(y = Max_Day_Use, x=PWSID)) +
+  geom_boxplot()
 
 ```
 
