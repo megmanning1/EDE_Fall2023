@@ -1,0 +1,100 @@
+---
+title: "EJ_EDH_WA"
+author: "Meg Manning"
+date: "2023-11-16"
+output: pdf_document
+---
+
+Working with WA Environmental Health Disparities Data
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rvest)
+library(lubridate)
+library(here); here()
+library(sf)
+library(leaflet)
+library(mapview); mapviewOptions(fgb = FALSE)
+library(viridis)
+
+#mytheme <- theme_classic(base_size = 14) +
+  #theme(axis.text = element_text(color = "black"), 
+        #legend.position = "top",
+        #panel.background = element_rect(fill = "beige"))
+#theme_set(mytheme)
+
+#load data 
+WA_EHD_df <- read.csv("./Environmental_Health_Disparities%2C_Overall_Ranking_(Current_Version).csv")
+
+#make visual data
+WA_EHD_sf <- st_read("./Environmental_Health_Disparities%2C_Overall_Ranking_(Current_Version)/EHD.shp")
+
+st_crs(WA_EHD_sf) #WGS 84
+
+#Visualize 
+ggplot() +
+  geom_sf(data = WA_EHD_sf, aes(fill = EHD_Rank, color = EHD_Rank)) +
+  scale_fill_viridis_c(option = "A", direction = -1) +
+  scale_color_viridis_c(option = "A", direction = -1) + 
+  labs(title = "Environmental Health Disparities by Census Tract (WA)",
+       subtitle = "Meg Manning",
+       fill = "EHD Ranking (1-10)",
+       color = "EHD Ranking (1-10)")
+
+#Mapview
+mapView(WA_EHD_sf)
+
+#Create new df for EHD = 10
+EHD_10_sf <- WA_EHD_sf %>%
+  filter(EHD_Rank == 10)
+
+#Map with EHD = 10
+ggplot() +
+  geom_sf(data = WA_EHD_sf, aes(fill = EHD_Rank, color = EHD_Rank, alpha = 0.2)) +
+  scale_fill_viridis_c(option = "A", direction = -1) +
+  scale_color_viridis_c(option = "A", direction = -1) +
+  geom_sf(data = EHD_10_sf, fill = "red")
+  labs(title = "Environmental Health Disparities by Census Tract (WA)",
+       subtitle = "Meg Manning",
+       fill = "EHD Ranking (1-10)",
+       color = "EHD Ranking (1-10)")
+  
+#Interactive view
+mapView(WA_EHD_sf, zcol = "EHD_Rank", col.regions = viridis(10, option = "A", direction = -1)) +
+  mapView(EHD_10_sf, zcol = "EHD_Rank", col = "red")
+
+mapView(WA_EHD_sf, zcol = "EHD_Rank", col.regions = viridis(10, option = "A", direction = -1))
+
+#AQI Data 
+AQI_2022 <- read.csv("./annual_aqi_by_county_2022.csv")
+
+king_county_AQI <- AQI_2022 %>%
+  filter(County == "King")
+
+#Convert to spatial data 
+
+
+
+
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
